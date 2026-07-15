@@ -192,6 +192,40 @@ function classify(volume, pitch) {
 let peakVol = 0, peakAt = 0;
 let heldLabel = 'silence', heldAt = 0;
 
+// ===== Meow event detection (Step 2) =====
+// Turns per-frame classifications into discrete meow events with
+// {duration, glide, quality}, gated by duration range and cooldown.
+let meowActive = false, meowStartTime = 0, meowPitches = [];
+let lastCountedMeowAt = -Infinity;
+
+function onMeowEvent(evt) {
+  if (DEBUG) console.log('meow event', evt);
+}
+
+function updateMeowTracking(label, pitch, now) {
+  if (label === 'meow') {
+    if (!meowActive) { meowActive = true; meowStartTime = now; meowPitches = []; }
+    if (pitch > 0) meowPitches.push(pitch);
+    return;
+  }
+  if (!meowActive) return;
+  meowActive = false;
+  const durationSec = (now - meowStartTime) / 1000;
+  if (durationSec < CONFIG.meowMinSec || durationSec > CONFIG.meowMaxSec) return;
+  if ((now - lastCountedMeowAt) / 1000 < CONFIG.cooldownSec) return;
+
+  const n = meowPitches.length;
+  const glideHz = n >= 2 ? meowPitches[n - 1] - meowPitches[0] : 0;
+  const glide = Math.abs(glideHz) >= 20; // 20Hz+ contour shift counts as a glide
+  const mid = (CONFIG.meowMinSec + CONFIG.meowMaxSec) / 2;
+  const halfRange = (CONFIG.meowMaxSec - CONFIG.meowMinSec) / 2;
+  const durationFit = 1 - Math.min(1, Math.abs(durationSec - mid) / halfRange);
+  const quality = Math.min(1, durationFit * 0.8 + (glide ? 0.2 : 0));
+
+  lastCountedMeowAt = now;
+  onMeowEvent({ duration: +durationSec.toFixed(2), glide, quality: +quality.toFixed(2) });
+}
+
 function frameLoop() {
   analyser.getFloatTimeDomainData(timeData);
   const volume = rms(timeData);
@@ -199,6 +233,7 @@ function frameLoop() {
   const label = classify(volume, pitch);
 
   const now = performance.now();
+  updateMeowTracking(label, pitch, now);
   if (volume > peakVol || now - peakAt > 3000) { peakVol = volume; peakAt = now; }
 
   // Hold the loudest label briefly so a short scream/meow doesn't flash past
