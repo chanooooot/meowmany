@@ -190,6 +190,7 @@ function classify(volume, pitch) {
 }
 
 let peakVol = 0, peakAt = 0;
+let heldLabel = 'silence', heldAt = 0;
 
 function frameLoop() {
   analyser.getFloatTimeDomainData(timeData);
@@ -200,8 +201,16 @@ function frameLoop() {
   const now = performance.now();
   if (volume > peakVol || now - peakAt > 3000) { peakVol = volume; peakAt = now; }
 
+  // Hold the loudest label briefly so a short scream/meow doesn't flash past
+  // faster than the eye can read it (labels update ~60x/sec).
+  const labelRank = { silence: 0, talk: 1, meow: 2, scream: 3 };
+  if (labelRank[label] >= labelRank[heldLabel] || now - heldAt > 500) {
+    heldLabel = label;
+    heldAt = now;
+  }
+
   if (DEBUG) {
-    dbgLabel.textContent = label;
+    dbgLabel.textContent = heldLabel;
     dbgVol.textContent = volume.toFixed(4);
     dbgVolBar.style.width = Math.min(100, (volume / scareVol) * 100) + '%';
     dbgPitch.textContent = pitch > 0 ? Math.round(pitch) : '-';
