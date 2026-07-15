@@ -95,7 +95,9 @@ async function startAudio() {
   }
   let stream;
   try {
-    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: { autoGainControl: false, noiseSuppression: false, echoCancellation: false }
+    });
   } catch (err) {
     showError('Mic access denied', 'Meow Me needs your microphone to hear you. Please allow mic access and try again.');
     return;
