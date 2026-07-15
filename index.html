@@ -14,6 +14,25 @@
   #debug .bar{height:10px;background:#333;border-radius:4px;overflow:hidden;margin:4px 0;}
   #debug .bar>div{height:100%;background:#4caf50;width:0%;}
   #debug.on{display:block;}
+
+  #scene{display:none;position:relative;height:100%;overflow:hidden;
+    background:linear-gradient(#1b2a4a,#0e1626 60%,#2b241b 60%);}
+  #micMeterWrap{position:absolute;top:10px;left:10px;right:10px;height:8px;background:#333;border-radius:4px;overflow:hidden;}
+  #micMeterBar{height:100%;width:0%;background:#4caf50;}
+  #timeLeftDisplay{position:absolute;top:24px;right:10px;font-size:14px;color:#eee;}
+  #playerZone{position:absolute;bottom:10px;right:6%;font-size:2.2rem;}
+  #catWrap{position:absolute;bottom:10px;transition:left .15s linear;}
+  #catWrap.walking{animation:walkBob .3s ease-in-out 2;}
+  #catWrap.scared{animation:scaredShake .4s ease-out;}
+  #catWrap.happy{animation:happyBounce .6s ease-in-out infinite;}
+  #cat .tail{transform-origin:14px 46px;animation:tailSway 2s ease-in-out infinite;}
+  @keyframes tailSway{0%,100%{transform:rotate(-8deg);}50%{transform:rotate(8deg);}}
+  @keyframes walkBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+  @keyframes scaredShake{0%{transform:translateX(0) rotate(0);}20%{transform:translateX(-10px) rotate(-8deg);}
+    40%{transform:translateX(8px) rotate(6deg);}60%{transform:translateX(-6px) rotate(-4deg);}100%{transform:translateX(0) rotate(0);}}
+  @keyframes happyBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+  .heart{position:absolute;font-size:1.5rem;animation:heartFloat 1s ease-out forwards;pointer-events:none;}
+  @keyframes heartFloat{0%{transform:translateY(0);opacity:1;}100%{transform:translateY(-60px);opacity:0;}}
 </style>
 </head>
 <body>
@@ -46,7 +65,23 @@
   <div>(debug keys: m = simulate meow, s = simulate scream)</div>
 </div>
 
-<!-- STEP 3+: game scene will go here -->
+<div id="scene">
+  <div id="micMeterWrap"><div id="micMeterBar"></div></div>
+  <div id="timeLeftDisplay"></div>
+  <div id="playerZone">🧍</div>
+  <div id="catWrap">
+    <svg id="cat" viewBox="0 0 100 60" width="100" height="60" overflow="visible">
+      <ellipse class="tail" cx="14" cy="46" rx="4" ry="16" fill="#555"/>
+      <ellipse cx="55" cy="45" rx="30" ry="14" fill="#666"/>
+      <circle cx="82" cy="30" r="14" fill="#666"/>
+      <polygon points="72,20 78,6 84,20" fill="#666"/>
+      <polygon points="88,20 94,6 98,22" fill="#666"/>
+      <circle cx="78" cy="28" r="2" fill="#111"/>
+      <circle cx="90" cy="28" r="2" fill="#111"/>
+    </svg>
+  </div>
+</div>
+
 <!-- STEP 6+: end screens will go here -->
 
 <script>
@@ -81,6 +116,10 @@ const dbgLabel = document.getElementById('dbgLabel');
 const dbgVol = document.getElementById('dbgVol');
 const dbgVolBar = document.getElementById('dbgVolBar');
 const dbgPitch = document.getElementById('dbgPitch');
+const scene = document.getElementById('scene');
+const catWrap = document.getElementById('catWrap');
+const micMeterBar = document.getElementById('micMeterBar');
+const timeLeftDisplay = document.getElementById('timeLeftDisplay');
 
 if (DEBUG) debugPanel.classList.add('on');
 
@@ -120,6 +159,7 @@ async function startAudio() {
   source.connect(analyser);
 
   landing.style.display = 'none';
+  scene.style.display = 'block';
   gameState = 'calibrating';
   await calibrate();
   startGame();
@@ -141,21 +181,53 @@ function startGame() {
 
 function checkWinLose() {
   if (gameState !== 'playing') return;
-  if (catPos >= 100) gameState = 'won';
+  if (catPos >= 100) { gameState = 'won'; spawnHearts(); }
   else if (catPos <= 0) gameState = 'lost';
+}
+
+let catAnimTimeout;
+function setCatAnim(cls, durationMs) {
+  catWrap.classList.remove('walking', 'scared');
+  clearTimeout(catAnimTimeout);
+  catWrap.classList.add(cls);
+  catAnimTimeout = setTimeout(() => catWrap.classList.remove(cls), durationMs);
+}
+
+function spawnHearts() {
+  catWrap.classList.add('happy');
+  for (let i = 0; i < 3; i++) {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.textContent = '❤️';
+    heart.style.left = (30 + i * 15) + 'px';
+    heart.style.bottom = (20 + i * 5) + 'px';
+    catWrap.appendChild(heart);
+    setTimeout(() => heart.remove(), 1000);
+  }
 }
 
 function applyGoodMeow(evt) {
   if (gameState !== 'playing') return;
   catPos = Math.min(100, catPos + CONFIG.stepGood + (evt.glide ? CONFIG.stepGlideBonus : 0));
   lastGoodMeowAt = performance.now();
+  setCatAnim('walking', 300);
   checkWinLose();
 }
 
 function applyScream() {
   if (gameState !== 'playing') return;
   catPos = Math.max(0, catPos - CONFIG.stepScare);
+  setCatAnim('scared', 400);
   checkWinLose();
+}
+
+function renderScene(volume) {
+  if (gameState === 'landing') return;
+  catWrap.style.left = (5 + catPos * 0.75) + '%';
+  micMeterBar.style.width = scareVol ? Math.min(100, (volume / scareVol) * 100) + '%' : '0%';
+  timeLeftDisplay.textContent = gameState === 'playing'
+    ? Math.ceil(Math.max(0, CONFIG.roundSec - (performance.now() - roundStartAt) / 1000)) + 's'
+    : '';
 }
 
 function gameTick(now) {
@@ -297,6 +369,7 @@ function frameLoop() {
   if (label === 'scream' && lastRawLabel !== 'scream') applyScream();
   lastRawLabel = label;
   gameTick(now);
+  renderScene(volume);
   if (volume > peakVol || now - peakAt > 3000) { peakVol = volume; peakAt = now; }
 
   // Hold the loudest label briefly so a short scream/meow doesn't flash past
