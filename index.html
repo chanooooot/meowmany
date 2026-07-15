@@ -51,9 +51,9 @@
 const CONFIG = {
   pitchMinHz: 150, pitchMaxHz: 600,
   meowMinSec: 0.3, meowMaxSec: 1.5,
-  minVolMultiplier: 2.0,   // minVol = noiseFloor * this
+  minVolMultiplier: 1.5,   // minVol = noiseFloor * this
   scareVolMultiplier: 6.0, // scareVol = noiseFloor * this
-  minVolFloor: 0.005,      // absolute floors so a quiet room can't collapse thresholds
+  minVolFloor: 0.0015,     // absolute floors so a quiet room can't collapse thresholds
   scareVolFloor: 0.08,     // phone mics report much lower RMS than laptops
   cooldownSec: 0.7,
   driftAfterSec: 4,
@@ -154,7 +154,7 @@ function rms(buf) {
 function detectPitch(buf, sampleRate) {
   const size = buf.length;
   let rmsVal = rms(buf);
-  if (rmsVal < 0.01) return -1; // too quiet to bother
+  if (rmsVal < minVol) return -1; // below speech threshold, skip pitch work
 
   let r1 = 0, r2 = size - 1;
   const threshold = 0.2;
