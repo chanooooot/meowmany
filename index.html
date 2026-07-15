@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meow Me 🐱</title>
+<style>
+  html,body{margin:0;height:100%;background:#111;color:#eee;font-family:system-ui,-apple-system,sans-serif;}
+  #landing{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;text-align:center;padding:24px;box-sizing:border-box;}
+  #landing h1{font-size:2rem;margin:0;}
+  #startBtn{font-size:1.2rem;padding:14px 28px;border-radius:12px;border:none;background:#ffb347;color:#111;font-weight:bold;}
+  #errorScreen{display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;text-align:center;padding:24px;box-sizing:border-box;}
+  #debug{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.85);padding:10px;font-family:monospace;font-size:13px;}
+  #debug .bar{height:10px;background:#333;border-radius:4px;overflow:hidden;margin:4px 0;}
+  #debug .bar>div{height:100%;background:#4caf50;width:0%;}
+  #debug.on{display:block;}
+</style>
+</head>
+<body>
+
+<!--
+  Step 0/1 skeleton. Only landing + debug panel wired up so far.
+  Sections below are placeholders for later PLAN.md steps.
+-->
+
+<div id="landing">
+  <h1>Meow Me 🐱</h1>
+  <p>Meow into your mic to coax the cat closer.</p>
+  <button id="startBtn">Start meowing 🐱</button>
+</div>
+
+<div id="errorScreen">
+  <h2 id="errorTitle">Mic trouble</h2>
+  <p id="errorMsg"></p>
+  <button id="retryBtn">Try again</button>
+</div>
+
+<div id="debug">
+  <div>label: <span id="dbgLabel">-</span></div>
+  <div>volume: <span id="dbgVol">0</span> <div class="bar"><div id="dbgVolBar"></div></div></div>
+  <div>pitch: <span id="dbgPitch">-</span> Hz</div>
+</div>
+
+<!-- STEP 3+: game scene will go here -->
+<!-- STEP 6+: end screens will go here -->
+
+<script>
+// ===== CONFIG — all tunables live here =====
+const CONFIG = {
+  pitchMinHz: 150, pitchMaxHz: 600,
+  meowMinSec: 0.3, meowMaxSec: 1.5,
+  minVolMultiplier: 2.0,   // minVol = noiseFloor * this
+  scareVolMultiplier: 6.0, // scareVol = noiseFloor * this
+  cooldownSec: 0.7,
+  driftAfterSec: 4,
+  roundSec: 60,
+  stepGood: 8, stepGlideBonus: 4,
+  stepScare: 15, driftSpeed: 3,
+  calibrationSec: 1
+};
+
+const DEBUG = new URLSearchParams(location.search).get('debug') === '1';
+
+// ===== DOM refs =====
+const landing = document.getElementById('landing');
+const startBtn = document.getElementById('startBtn');
+const errorScreen = document.getElementById('errorScreen');
+const errorTitle = document.getElementById('errorTitle');
+const errorMsg = document.getElementById('errorMsg');
+const retryBtn = document.getElementById('retryBtn');
+const debugPanel = document.getElementById('debug');
+const dbgLabel = document.getElementById('dbgLabel');
+const dbgVol = document.getElementById('dbgVol');
+const dbgVolBar = document.getElementById('dbgVolBar');
+const dbgPitch = document.getElementById('dbgPitch');
+
+if (DEBUG) debugPanel.classList.add('on');
+
+// ===== Audio pipeline (Step 1) =====
+let audioCtx, analyser, timeData;
+let noiseFloor = 0.01;
+let minVol, scareVol;
+
+function showError(title, msg) {
+  landing.style.display = 'none';
+  errorScreen.style.display = 'flex';
+  errorTitle.textContent = title;
+  errorMsg.textContent = msg;
+}
+
+async function startAudio() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showError('No mic support', 'Your browser can\'t access the microphone. Try opening this page in Chrome or Safari (not an in-app browser like LINE).');
+    return;
+  }
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    showError('Mic access denied', 'Meow Me needs your microphone to hear you. Please allow mic access and try again.');
+    return;
+  }
+
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  await audioCtx.resume();
+  const source = audioCtx.createMediaStreamSource(stream);
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 2048;
+  timeData = new Float32Array(analyser.fftSize);
+  source.connect(analyser);
+
+  landing.style.display = 'none';
+  await calibrate();
+  requestAnimationFrame(frameLoop);
+}
+
+function calibrate() {
+  return new Promise(resolve => {
+    const samples = [];
+    const start = performance.now();
+    function sample() {
+      analyser.getFloatTimeDomainData(timeData);
+      samples.push(rms(timeData));
+      if (performance.now() - start < CONFIG.calibrationSec * 1000) {
+        requestAnimationFrame(sample);
+      } else {
+        noiseFloor = Math.max(0.001, samples.reduce((a, b) => a + b, 0) / samples.length);
+        minVol = noiseFloor * CONFIG.minVolMultiplier;
+        scareVol = noiseFloor * CONFIG.scareVolMultiplier;
+        resolve();
+      }
+    }
+    sample();
+  });
+}
+
+function rms(buf) {
+  let sum = 0;
+  for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+  return Math.sqrt(sum / buf.length);
+}
+
+// Autocorrelation pitch detection (standard ACF approach).
+function detectPitch(buf, sampleRate) {
+  const size = buf.length;
+  let rmsVal = rms(buf);
+  if (rmsVal < 0.01) return -1; // too quiet to bother
+
+  let r1 = 0, r2 = size - 1;
+  const threshold = 0.2;
+  for (let i = 0; i < size / 2; i++) if (Math.abs(buf[i]) > threshold) { r1 = i; break; }
+  for (let i = 1; i < size / 2; i++) if (Math.abs(buf[size - i]) > threshold) { r2 = size - i; break; }
+  const trimmed = buf.slice(r1, r2);
+  const n = trimmed.length;
+
+  const c = new Array(n).fill(0);
+  for (let lag = 0; lag < n; lag++) {
+    for (let i = 0; i < n - lag; i++) c[lag] += trimmed[i] * trimmed[i + lag];
+  }
+  let d = 0;
+  while (c[d] > c[d + 1]) d++;
+  let maxVal = -1, maxPos = -1;
+  for (let i = d; i < n; i++) {
+    if (c[i] > maxVal) { maxVal = c[i]; maxPos = i; }
+  }
+  let T0 = maxPos;
+  if (T0 <= 0) return -1;
+  // Parabolic interpolation for sub-sample accuracy.
+  const x1 = c[T0 - 1] || c[T0], x2 = c[T0], x3 = c[T0 + 1] || c[T0];
+  const a = (x1 + x3 - 2 * x2) / 2, b = (x3 - x1) / 2;
+  if (a) T0 = T0 - b / (2 * a);
+  return sampleRate / T0;
+}
+
+function classify(volume, pitch) {
+  if (volume >= scareVol) return 'scream';
+  if (volume < minVol) return 'silence';
+  if (pitch >= CONFIG.pitchMinHz && pitch <= CONFIG.pitchMaxHz) return 'meow';
+  return 'talk';
+}
+
+function frameLoop() {
+  analyser.getFloatTimeDomainData(timeData);
+  const volume = rms(timeData);
+  const pitch = detectPitch(timeData, audioCtx.sampleRate);
+  const label = classify(volume, pitch);
+
+  if (DEBUG) {
+    dbgLabel.textContent = label;
+    dbgVol.textContent = volume.toFixed(4);
+    dbgVolBar.style.width = Math.min(100, (volume / scareVol) * 100) + '%';
+    dbgPitch.textContent = pitch > 0 ? Math.round(pitch) : '-';
+  }
+
+  requestAnimationFrame(frameLoop);
+}
+
+startBtn.addEventListener('click', startAudio, { once: false });
+retryBtn.addEventListener('click', () => {
+  errorScreen.style.display = 'none';
+  landing.style.display = 'flex';
+});
+</script>
+</body>
+</html>
