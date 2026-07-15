@@ -42,6 +42,8 @@
   <div>thresholds: min <span id="dbgMin">-</span> / scare <span id="dbgScare">-</span></div>
   <div>peak (3s): <span id="dbgPeak">0</span></div>
   <div>meow events: <span id="dbgMeowCount">0</span> — last: <span id="dbgMeowLast">-</span></div>
+  <div>game: <span id="dbgGameState">-</span> — catPos: <span id="dbgCatPos">-</span> — time left: <span id="dbgTimeLeft">-</span>s</div>
+  <div>(debug keys: m = simulate meow, s = simulate scream)</div>
 </div>
 
 <!-- STEP 3+: game scene will go here -->
@@ -61,7 +63,8 @@ const CONFIG = {
   roundSec: 60,
   stepGood: 8, stepGlideBonus: 4,
   stepScare: 15, driftSpeed: 3,
-  calibrationSec: 1
+  calibrationSec: 1,
+  catStartPos: 50 // 0 = fully off-screen (lose), 100 = reached player (win)
 };
 
 const DEBUG = new URLSearchParams(location.search).get('debug') === '1';
@@ -117,8 +120,54 @@ async function startAudio() {
   source.connect(analyser);
 
   landing.style.display = 'none';
+  gameState = 'calibrating';
   await calibrate();
+  startGame();
   requestAnimationFrame(frameLoop);
+}
+
+// ===== Game state machine (Step 3) =====
+// States: landing -> calibrating -> playing -> won | lost.
+let gameState = 'landing';
+let catPos = 0, roundStartAt = 0, lastGoodMeowAt = 0, lastTickAt = 0;
+
+function startGame() {
+  catPos = CONFIG.catStartPos;
+  roundStartAt = performance.now();
+  lastGoodMeowAt = roundStartAt;
+  lastTickAt = roundStartAt;
+  gameState = 'playing';
+}
+
+function checkWinLose() {
+  if (gameState !== 'playing') return;
+  if (catPos >= 100) gameState = 'won';
+  else if (catPos <= 0) gameState = 'lost';
+}
+
+function applyGoodMeow(evt) {
+  if (gameState !== 'playing') return;
+  catPos = Math.min(100, catPos + CONFIG.stepGood + (evt.glide ? CONFIG.stepGlideBonus : 0));
+  lastGoodMeowAt = performance.now();
+  checkWinLose();
+}
+
+function applyScream() {
+  if (gameState !== 'playing') return;
+  catPos = Math.max(0, catPos - CONFIG.stepScare);
+  checkWinLose();
+}
+
+function gameTick(now) {
+  const dt = (now - lastTickAt) / 1000;
+  lastTickAt = now;
+  if (gameState !== 'playing') return;
+
+  if ((now - roundStartAt) / 1000 >= CONFIG.roundSec) { gameState = 'lost'; return; }
+  if ((now - lastGoodMeowAt) / 1000 > CONFIG.driftAfterSec) {
+    catPos = Math.max(0, catPos - CONFIG.driftSpeed * dt);
+    checkWinLose();
+  }
 }
 
 function calibrate() {
@@ -192,6 +241,7 @@ function classify(volume, pitch) {
 
 let peakVol = 0, peakAt = 0;
 let heldLabel = 'silence', heldAt = 0;
+let lastRawLabel = 'silence';
 
 // ===== Meow event detection (Step 2) =====
 // Turns per-frame classifications into discrete meow events with
@@ -231,7 +281,9 @@ function updateMeowTracking(label, pitch, now) {
   const quality = Math.min(1, durationFit * 0.8 + (glide ? 0.2 : 0));
 
   lastCountedMeowAt = now;
-  onMeowEvent({ duration: +durationSec.toFixed(2), glide, quality: +quality.toFixed(2) });
+  const evt = { duration: +durationSec.toFixed(2), glide, quality: +quality.toFixed(2) };
+  onMeowEvent(evt);
+  applyGoodMeow(evt);
 }
 
 function frameLoop() {
@@ -242,6 +294,9 @@ function frameLoop() {
 
   const now = performance.now();
   updateMeowTracking(label, pitch, now);
+  if (label === 'scream' && lastRawLabel !== 'scream') applyScream();
+  lastRawLabel = label;
+  gameTick(now);
   if (volume > peakVol || now - peakAt > 3000) { peakVol = volume; peakAt = now; }
 
   // Hold the loudest label briefly so a short scream/meow doesn't flash past
@@ -258,9 +313,22 @@ function frameLoop() {
     dbgVolBar.style.width = Math.min(100, (volume / scareVol) * 100) + '%';
     dbgPitch.textContent = pitch > 0 ? Math.round(pitch) : '-';
     document.getElementById('dbgPeak').textContent = peakVol.toFixed(4);
+    document.getElementById('dbgGameState').textContent = gameState;
+    document.getElementById('dbgCatPos').textContent = Math.round(catPos);
+    const timeLeft = gameState === 'playing'
+      ? Math.max(0, CONFIG.roundSec - (now - roundStartAt) / 1000)
+      : 0;
+    document.getElementById('dbgTimeLeft').textContent = Math.round(timeLeft);
   }
 
   requestAnimationFrame(frameLoop);
+}
+
+if (DEBUG) {
+  document.addEventListener('keydown', e => {
+    if (e.key === 'm') applyGoodMeow({ duration: 0.6, glide: true, quality: 1 });
+    if (e.key === 's') applyScream();
+  });
 }
 
 startBtn.addEventListener('click', startAudio, { once: false });
