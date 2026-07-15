@@ -46,13 +46,14 @@
 
 <div id="landing">
   <h1>Meow Me 🐱</h1>
-  <p>Meow into your mic to coax the cat closer.</p>
+  <p>Meow into your mic to coax the cat closer.<br>Scream and it runs away. No pressure, ทาสแมว.</p>
   <button id="startBtn">Start meowing 🐱</button>
 </div>
 
 <div id="errorScreen">
   <h2 id="errorTitle">Mic trouble</h2>
   <p id="errorMsg"></p>
+  <button id="copyLinkBtn" style="display:none;">Copy link 📋</button>
   <button id="retryBtn">Try again</button>
 </div>
 
@@ -118,6 +119,7 @@ const errorScreen = document.getElementById('errorScreen');
 const errorTitle = document.getElementById('errorTitle');
 const errorMsg = document.getElementById('errorMsg');
 const retryBtn = document.getElementById('retryBtn');
+const copyLinkBtn = document.getElementById('copyLinkBtn');
 const debugPanel = document.getElementById('debug');
 const dbgLabel = document.getElementById('dbgLabel');
 const dbgVol = document.getElementById('dbgVol');
@@ -141,16 +143,28 @@ let audioCtx, analyser, timeData;
 let noiseFloor = 0.01;
 let minVol, scareVol;
 
-function showError(title, msg) {
+function showError(title, msg, showCopyLink) {
   landing.style.display = 'none';
   errorScreen.style.display = 'flex';
   errorTitle.textContent = title;
   errorMsg.textContent = msg;
+  copyLinkBtn.style.display = showCopyLink ? 'inline-block' : 'none';
 }
+
+copyLinkBtn.addEventListener('click', () => {
+  navigator.clipboard?.writeText(location.href).then(() => {
+    copyLinkBtn.textContent = 'Copied! ✅';
+    setTimeout(() => { copyLinkBtn.textContent = 'Copy link 📋'; }, 1500);
+  });
+});
 
 async function startAudio() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    showError('No mic support', 'Your browser can\'t access the microphone. Try opening this page in Chrome or Safari (not an in-app browser like LINE).');
+    const isLineUA = /Line/i.test(navigator.userAgent);
+    const msg = isLineUA
+      ? 'LINE\'s in-app browser can\'t access the microphone. Copy this link and open it in Chrome or Safari instead.'
+      : 'Your browser can\'t access the microphone. Try opening this page in Chrome or Safari (not an in-app browser like LINE).';
+    showError('No mic support', msg, true);
     return;
   }
   let stream;
