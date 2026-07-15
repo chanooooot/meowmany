@@ -218,7 +218,6 @@ function endRound(result) {
   gameState = result;
   if (result === 'won') {
     spawnHearts();
-    playPurr();
     setTimeout(() => showEndScreen('won'), 900);
   } else {
     showEndScreen('lost');
@@ -292,7 +291,6 @@ function applyGoodMeow(evt) {
   totalQuality += evt.quality;
   meowCountForScore++;
   setCatAnim('walking', 300);
-  playMrrp();
   checkWinLose();
 }
 
@@ -300,56 +298,7 @@ function applyScream() {
   if (gameState !== 'playing') return;
   catPos = Math.max(0, catPos - CONFIG.stepScare);
   setCatAnim('scared', 400);
-  playScare();
   checkWinLose();
-}
-
-// ===== SFX (Step 5) — synthesized via oscillators, no audio files =====
-function playMrrp() {
-  const t = audioCtx.currentTime;
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(400, t);
-  osc.frequency.linearRampToValueAtTime(650, t + 0.08);
-  osc.frequency.linearRampToValueAtTime(400, t + 0.15);
-  gain.gain.setValueAtTime(0.15, t);
-  gain.gain.linearRampToValueAtTime(0, t + 0.15);
-  osc.connect(gain).connect(audioCtx.destination);
-  osc.start(t); osc.stop(t + 0.16);
-}
-
-function playScare() {
-  const t = audioCtx.currentTime;
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.type = 'square';
-  osc.frequency.setValueAtTime(800, t);
-  osc.frequency.exponentialRampToValueAtTime(150, t + 0.15);
-  gain.gain.setValueAtTime(0.2, t);
-  gain.gain.linearRampToValueAtTime(0, t + 0.18);
-  osc.connect(gain).connect(audioCtx.destination);
-  osc.start(t); osc.stop(t + 0.2);
-}
-
-function playPurr() {
-  const t = audioCtx.currentTime;
-  const tone = audioCtx.createOscillator();
-  const toneGain = audioCtx.createGain();
-  const lfo = audioCtx.createOscillator();
-  const lfoGain = audioCtx.createGain();
-  tone.type = 'sine';
-  tone.frequency.value = 70;
-  lfo.type = 'sine';
-  lfo.frequency.value = 25; // purr rumble rate
-  lfoGain.gain.value = 0.1;
-  toneGain.gain.value = 0.12;
-  lfo.connect(lfoGain).connect(toneGain.gain);
-  tone.connect(toneGain).connect(audioCtx.destination);
-  toneGain.gain.setValueAtTime(0.12, t);
-  toneGain.gain.linearRampToValueAtTime(0, t + 1.2);
-  lfo.start(t); tone.start(t);
-  lfo.stop(t + 1.2); tone.stop(t + 1.2);
 }
 
 function renderScene(volume) {
