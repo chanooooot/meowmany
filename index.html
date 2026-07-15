@@ -10,6 +10,8 @@
   #landing h1{font-size:2rem;margin:0;}
   #startBtn{font-size:1.2rem;padding:14px 28px;border-radius:12px;border:none;background:#ffb347;color:#111;font-weight:bold;}
   #errorScreen{display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;text-align:center;padding:24px;box-sizing:border-box;}
+  #endScreen{display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;text-align:center;padding:24px;box-sizing:border-box;}
+  #endRetryBtn{font-size:1.2rem;padding:14px 28px;border-radius:12px;border:none;background:#ffb347;color:#111;font-weight:bold;}
   #debug{display:none;position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,.85);padding:10px;font-family:monospace;font-size:13px;z-index:10;}
   #debug .bar{height:10px;background:#333;border-radius:4px;overflow:hidden;margin:4px 0;}
   #debug .bar>div{height:100%;background:#4caf50;width:0%;}
@@ -82,7 +84,12 @@
   </div>
 </div>
 
-<!-- STEP 6+: end screens will go here -->
+<div id="endScreen">
+  <h2 id="endTitle"></h2>
+  <p id="endMsg"></p>
+  <p id="endStats"></p>
+  <button id="endRetryBtn">Retry</button>
+</div>
 
 <script>
 // ===== CONFIG — all tunables live here =====
@@ -120,6 +127,12 @@ const scene = document.getElementById('scene');
 const catWrap = document.getElementById('catWrap');
 const micMeterBar = document.getElementById('micMeterBar');
 const timeLeftDisplay = document.getElementById('timeLeftDisplay');
+const endScreen = document.getElementById('endScreen');
+const endTitle = document.getElementById('endTitle');
+const endMsg = document.getElementById('endMsg');
+const endStats = document.getElementById('endStats');
+const endRetryBtn = document.getElementById('endRetryBtn');
+const BEST_TIME_KEY = 'meowme_best_time';
 
 if (DEBUG) debugPanel.classList.add('on');
 
@@ -171,19 +184,71 @@ async function startAudio() {
 let gameState = 'landing';
 let catPos = 0, roundStartAt = 0, lastGoodMeowAt = 0, lastTickAt = 0;
 
+let totalQuality = 0, meowCountForScore = 0;
+
 function startGame() {
   catPos = CONFIG.catStartPos;
   roundStartAt = performance.now();
   lastGoodMeowAt = roundStartAt;
   lastTickAt = roundStartAt;
+  totalQuality = 0;
+  meowCountForScore = 0;
+  catWrap.classList.remove('happy', 'scared', 'walking');
+  catWrap.querySelectorAll('.heart').forEach(h => h.remove());
+  endScreen.style.display = 'none';
+  scene.style.display = 'block';
   gameState = 'playing';
+}
+
+function endRound(result) {
+  gameState = result;
+  if (result === 'won') {
+    spawnHearts();
+    playPurr();
+    setTimeout(() => showEndScreen('won'), 900);
+  } else {
+    showEndScreen('lost');
+  }
 }
 
 function checkWinLose() {
   if (gameState !== 'playing') return;
-  if (catPos >= 100) { gameState = 'won'; spawnHearts(); playPurr(); }
-  else if (catPos <= 0) gameState = 'lost';
+  if (catPos >= 100) endRound('won');
+  else if (catPos <= 0) endRound('lost');
 }
+
+function showEndScreen(result) {
+  scene.style.display = 'none';
+  endScreen.style.display = 'flex';
+  if (result === 'won') {
+    const completionTimeSec = (performance.now() - roundStartAt) / 1000;
+    const avgQuality = meowCountForScore ? totalQuality / meowCountForScore : 0;
+    const timeBonus = Math.max(0, Math.min(1, 1 - completionTimeSec / CONFIG.roundSec));
+    const score = avgQuality * 0.6 + timeBonus * 0.4;
+    const rank = score >= 0.8 ? 'S' : score >= 0.6 ? 'A' : score >= 0.35 ? 'B' : 'C';
+    const titles = {
+      S: 'ทาสแมวตัวจริง 🏆',
+      A: 'Certified Cat Whisperer',
+      B: 'The cat tolerates you',
+      C: 'แมวมาเพราะสงสาร 😹'
+    };
+
+    const prevBest = parseFloat(localStorage.getItem(BEST_TIME_KEY));
+    const isNewBest = isNaN(prevBest) || completionTimeSec < prevBest;
+    if (isNewBest) localStorage.setItem(BEST_TIME_KEY, completionTimeSec.toFixed(2));
+    const bestTime = isNewBest ? completionTimeSec : prevBest;
+
+    endTitle.textContent = `You win! 🐱 Rank ${rank}`;
+    endMsg.textContent = titles[rank];
+    endStats.textContent = `Time: ${completionTimeSec.toFixed(1)}s — Best: ${bestTime.toFixed(1)}s`;
+  } else {
+    endTitle.textContent = 'The cat ignored you 😾';
+    endMsg.textContent = 'แมวไม่สนใจคุณ';
+    endStats.textContent = '';
+  }
+}
+
+endRetryBtn.addEventListener('click', startGame);
 
 let catAnimTimeout;
 function setCatAnim(cls, durationMs) {
@@ -210,6 +275,8 @@ function applyGoodMeow(evt) {
   if (gameState !== 'playing') return;
   catPos = Math.min(100, catPos + CONFIG.stepGood + (evt.glide ? CONFIG.stepGlideBonus : 0));
   lastGoodMeowAt = performance.now();
+  totalQuality += evt.quality;
+  meowCountForScore++;
   setCatAnim('walking', 300);
   playMrrp();
   checkWinLose();
@@ -285,7 +352,7 @@ function gameTick(now) {
   lastTickAt = now;
   if (gameState !== 'playing') return;
 
-  if ((now - roundStartAt) / 1000 >= CONFIG.roundSec) { gameState = 'lost'; return; }
+  if ((now - roundStartAt) / 1000 >= CONFIG.roundSec) { endRound('lost'); return; }
   if ((now - lastGoodMeowAt) / 1000 > CONFIG.driftAfterSec) {
     catPos = Math.max(0, catPos - CONFIG.driftSpeed * dt);
     checkWinLose();
