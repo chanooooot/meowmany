@@ -41,6 +41,7 @@
   <div>pitch: <span id="dbgPitch">-</span> Hz</div>
   <div>thresholds: min <span id="dbgMin">-</span> / scare <span id="dbgScare">-</span></div>
   <div>peak (3s): <span id="dbgPeak">0</span></div>
+  <div>meow events: <span id="dbgMeowCount">0</span> — last: <span id="dbgMeowLast">-</span></div>
 </div>
 
 <!-- STEP 3+: game scene will go here -->
@@ -198,8 +199,15 @@ let heldLabel = 'silence', heldAt = 0;
 let meowActive = false, meowStartTime = 0, meowPitches = [];
 let lastCountedMeowAt = -Infinity;
 
+let meowEventCount = 0;
+
 function onMeowEvent(evt) {
-  if (DEBUG) console.log('meow event', evt);
+  if (!DEBUG) return;
+  console.log('meow event', evt);
+  meowEventCount++;
+  document.getElementById('dbgMeowCount').textContent = meowEventCount;
+  document.getElementById('dbgMeowLast').textContent =
+    `dur=${evt.duration}s glide=${evt.glide} quality=${evt.quality}`;
 }
 
 function updateMeowTracking(label, pitch, now) {
