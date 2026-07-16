@@ -8,7 +8,7 @@
   :root{
     --sky-top:#241a3d; --sky-mid:#2e2049; --ground:#3a2a2e;
     --marigold:#ff9f4a; --marigold-soft:#ffd9a0; --marigold-deep:#c96b2e;
-    --cream:#fff3e2; --ink:#2a2130; --muted:#c9b8d6;
+    --cream:#fff3e2; --ink:#2a2130; --muted:#c9b8d6; --fur-stroke:#8a4a1e;
     --rank-S:#ffd76a; --rank-A:#ff9f4a; --rank-B:#ff8fa3; --rank-C:#9aa5c9;
   }
   *{box-sizing:border-box;}
@@ -66,7 +66,7 @@
   #catWrap{position:absolute;bottom:14px;transition:left .15s linear;}
   #catWrap.walking{animation:walkBob .3s ease-in-out 2;}
   #catWrap.scared{animation:scaredShake .4s ease-out;}
-  #catWrap.happy{animation:happyBounce .6s ease-in-out infinite;}
+  #catWrap.happy{animation:catCelebrate .6s ease-in-out infinite;}
   #cat .tail{transform-origin:14px 54px;animation:tailSway 2s ease-in-out infinite;}
   #cat .eyes-scared,#cat .eyes-happy{display:none;}
   #catWrap.scared .eyes-idle{display:none;}
@@ -78,31 +78,49 @@
   @keyframes walkBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
   @keyframes scaredShake{0%{transform:translateX(0) rotate(0);}20%{transform:translateX(-10px) rotate(-8deg);}
     40%{transform:translateX(8px) rotate(6deg);}60%{transform:translateX(-6px) rotate(-4deg);}100%{transform:translateX(0) rotate(0);}}
-  @keyframes happyBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+  @keyframes catCelebrate{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
   .heart{position:absolute;font-size:1.5rem;animation:heartFloat 1s ease-out forwards;pointer-events:none;}
   @keyframes heartFloat{0%{transform:translateY(0);opacity:1;}100%{transform:translateY(-60px);opacity:0;}}
 
   @media (prefers-reduced-motion: reduce){
     #catWrap,#catWrap.walking,#catWrap.scared,#catWrap.happy,#cat .tail,.heart{animation:none !important;}
   }
+  #landing,#errorScreen,#endScreen{min-height:100vh;min-height:100dvh;padding:max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));}
+  button:focus-visible{outline:3px solid var(--cream);outline-offset:4px;}
+  button:disabled{cursor:wait;opacity:.7;}
+  #newBest{margin:0;color:var(--rank-color, var(--marigold-soft));font-weight:800;}
+  #shareHint{max-width:30ch;margin:0;color:var(--muted);font-size:.95rem;}
+  #scene{min-height:100vh;min-height:100dvh;}
+  #scene::after{display:none;}
+  #micMeterWrap{top:max(12px, env(safe-area-inset-top));left:max(10px, env(safe-area-inset-left));right:max(10px, env(safe-area-inset-right));}
+  #micMeterLabel{position:absolute;top:max(22px, calc(env(safe-area-inset-top) + 10px));left:max(10px, env(safe-area-inset-left));font-size:.75rem;color:var(--muted);}
+  #timeLeftDisplay{top:max(28px, calc(env(safe-area-inset-top) + 16px));right:max(10px, env(safe-area-inset-right));}
+  #gameStatus{position:absolute;top:max(46px, calc(env(safe-area-inset-top) + 34px));left:50%;width:min(28rem, calc(100% - 120px));transform:translateX(-50%);margin:0;text-align:center;color:var(--marigold-soft);font-weight:700;min-height:1.5em;}
+  #restartBtn{position:absolute;top:max(48px, calc(env(safe-area-inset-top) + 40px));right:max(10px, env(safe-area-inset-right));min-height:44px;padding:8px 14px;border:1px solid rgba(255,243,226,.45);border-radius:999px;background:rgba(36,26,61,.68);color:var(--cream);font-weight:700;}
+  #playerZone{bottom:max(14px, env(safe-area-inset-bottom));width:48px;height:68px;font-size:0;}
+  #playerZone .player-fill{fill:var(--cream);}
+  #playerZone .player-accent{fill:var(--marigold-soft);}
+  #playerZone .player-line{stroke:var(--ink);stroke-width:2;stroke-linecap:round;}
+  #catWrap{bottom:max(14px, env(safe-area-inset-bottom));}
+  @media (hover:hover){#startBtn:hover,#endRetryBtn:hover,#retryBtn:hover{transform:translateY(-2px);}#restartBtn:hover,#copyLinkBtn:hover{background:rgba(255,243,226,.14);}}
 </style>
 </head>
 <body>
 
-<div id="moon"></div>
+<div id="moon" aria-hidden="true"></div>
 
-<div id="landing">
-  <h1>Meow Me 🐱</h1>
-  <p>Meow into your mic to coax the cat closer.<br>Scream and it runs away. No pressure, ทาสแมว.</p>
+<main id="landing">
+  <h1 tabindex="-1">Meow Me 🐱</h1>
+  <p>Meow into your mic to coax the cat closer.<br>Scream and it runs away. No pressure, <span lang="th">ทาสแมว</span>.</p>
   <button id="startBtn">Start meowing 🐱</button>
-</div>
+</main>
 
-<div id="errorScreen">
-  <h2 id="errorTitle">Mic trouble</h2>
+<section id="errorScreen" aria-labelledby="errorTitle">
+  <h2 id="errorTitle" tabindex="-1">Mic trouble</h2>
   <p id="errorMsg"></p>
   <button id="copyLinkBtn" style="display:none;">Copy link 📋</button>
   <button id="retryBtn">Try again</button>
-</div>
+</section>
 
 <div id="debug">
   <div>label: <span id="dbgLabel">-</span></div>
@@ -115,48 +133,55 @@
   <div>(debug keys: m = simulate meow, s = simulate scream)</div>
 </div>
 
-<div id="scene">
-  <div id="micMeterWrap"><div id="micMeterBar"></div></div>
-  <div id="timeLeftDisplay"></div>
-  <div id="playerZone">🧍</div>
+<section id="scene" aria-label="Meow Me game">
+  <div id="micMeterWrap" aria-hidden="true"><div id="micMeterBar"></div></div>
+  <div id="micMeterLabel">Mic</div>
+  <div id="timeLeftDisplay" aria-hidden="true"></div>
+  <p id="gameStatus" role="status" aria-live="polite">Waiting to listen...</p>
+  <button id="restartBtn" type="button">Start over</button>
+  <svg id="playerZone" viewBox="0 0 48 68" aria-hidden="true">
+    <circle class="player-accent" cx="24" cy="14" r="10"/>
+    <path class="player-fill" d="M13 63V38c0-9 5-14 11-14s11 5 11 14v25z"/>
+    <path class="player-line" d="M24 24v23m-10 7 10-7 10 7m-12-30-8-6m12 6 8-6" fill="none"/>
+  </svg>
   <div id="catWrap">
     <svg id="cat" viewBox="0 0 115 70" width="128" height="78" overflow="visible">
-      <path class="tail" d="M14,58 Q0,42 10,18" fill="none" stroke="#ff9f4a" stroke-width="7"
+      <path class="tail" d="M14,58 Q0,42 10,18" fill="none" stroke="var(--marigold)" stroke-width="7"
         stroke-linecap="round"/>
-      <circle cx="10" cy="18" r="3.5" fill="#fff3e2"/>
+      <circle cx="10" cy="18" r="3.5" fill="var(--cream)"/>
 
-      <ellipse cx="55" cy="52" rx="30" ry="16" fill="#ff9f4a" stroke="#8a4a1e" stroke-width="1.5"/>
-      <ellipse cx="50" cy="59" rx="16" ry="8" fill="#fff3e2"/>
+      <ellipse cx="55" cy="52" rx="30" ry="16" fill="var(--marigold)" stroke="var(--fur-stroke)" stroke-width="1.5"/>
+      <ellipse cx="50" cy="59" rx="16" ry="8" fill="var(--cream)"/>
 
-      <circle cx="82" cy="34" r="15" fill="#ff9f4a" stroke="#8a4a1e" stroke-width="1.5"/>
-      <polygon points="70,24 76,7 85,23" fill="#ff9f4a" stroke="#8a4a1e" stroke-width="1.5"/>
-      <polygon points="72,21 76,12 80,20" fill="#ffd9a0"/>
-      <polygon points="87,21 95,6 99,24" fill="#ff9f4a" stroke="#8a4a1e" stroke-width="1.5"/>
-      <polygon points="89,19 95,11 98,21" fill="#ffd9a0"/>
+      <circle cx="82" cy="34" r="15" fill="var(--marigold)" stroke="var(--fur-stroke)" stroke-width="1.5"/>
+      <polygon points="70,24 76,7 85,23" fill="var(--marigold)" stroke="var(--fur-stroke)" stroke-width="1.5"/>
+      <polygon points="72,21 76,12 80,20" fill="var(--marigold-soft)"/>
+      <polygon points="87,21 95,6 99,24" fill="var(--marigold)" stroke="var(--fur-stroke)" stroke-width="1.5"/>
+      <polygon points="89,19 95,11 98,21" fill="var(--marigold-soft)"/>
 
       <circle cx="75" cy="40" r="3.5" fill="#ff8fa3" opacity=".55"/>
       <circle cx="92" cy="40" r="3.5" fill="#ff8fa3" opacity=".55"/>
 
       <g class="eyes-idle">
-        <circle cx="77" cy="32" r="2.2" fill="#2a2130"/>
-        <circle cx="90" cy="32" r="2.2" fill="#2a2130"/>
+        <circle cx="77" cy="32" r="2.2" fill="var(--ink)"/>
+        <circle cx="90" cy="32" r="2.2" fill="var(--ink)"/>
       </g>
       <g class="eyes-scared">
-        <circle cx="77" cy="32" r="4.5" fill="#fff3e2" stroke="#2a2130" stroke-width="1"/>
-        <circle cx="90" cy="32" r="4.5" fill="#fff3e2" stroke="#2a2130" stroke-width="1"/>
-        <circle cx="77" cy="32" r="1.6" fill="#2a2130"/>
-        <circle cx="90" cy="32" r="1.6" fill="#2a2130"/>
+        <circle cx="77" cy="32" r="4.5" fill="var(--cream)" stroke="var(--ink)" stroke-width="1"/>
+        <circle cx="90" cy="32" r="4.5" fill="var(--cream)" stroke="var(--ink)" stroke-width="1"/>
+        <circle cx="77" cy="32" r="1.6" fill="var(--ink)"/>
+        <circle cx="90" cy="32" r="1.6" fill="var(--ink)"/>
       </g>
-      <g class="eyes-happy" stroke="#2a2130" stroke-width="2" stroke-linecap="round" fill="none">
+      <g class="eyes-happy" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none">
         <path d="M74,32 Q77,28 80,32"/>
         <path d="M87,32 Q90,28 93,32"/>
       </g>
 
       <polygon points="82,37 85,37 83.5,40" fill="#ff8fa3"/>
-      <path d="M83.5,40 Q83.5,43 80,43 M83.5,40 Q83.5,43 87,43" stroke="#2a2130" stroke-width="1.3"
+      <path d="M83.5,40 Q83.5,43 80,43 M83.5,40 Q83.5,43 87,43" stroke="var(--ink)" stroke-width="1.3"
         fill="none" stroke-linecap="round"/>
 
-      <g stroke="#8a4a1e" stroke-width="1" opacity=".8">
+      <g stroke="var(--fur-stroke)" stroke-width="1" opacity=".8">
         <line x1="66" y1="36" x2="52" y2="33"/>
         <line x1="66" y1="40" x2="51" y2="40"/>
         <line x1="98" y1="36" x2="112" y2="33"/>
@@ -164,14 +189,16 @@
       </g>
     </svg>
   </div>
-</div>
+</section>
 
-<div id="endScreen">
-  <h2 id="endTitle"></h2>
+<section id="endScreen" aria-labelledby="endTitle">
+  <h2 id="endTitle" tabindex="-1"></h2>
   <p id="endMsg"></p>
+  <p id="newBest" hidden>New best!</p>
   <p id="endStats"></p>
-  <button id="endRetryBtn">Retry</button>
-</div>
+  <p id="shareHint" hidden>Screenshot this and challenge a friend.</p>
+  <button id="endRetryBtn">Play again</button>
+</section>
 
 <script>
 // ===== CONFIG — all tunables live here =====
@@ -188,6 +215,15 @@ const CONFIG = {
   stepGood: 8, stepGlideBonus: 4,
   stepScare: 15, driftSpeed: 3,
   calibrationSec: 1,
+  pitchTrimThreshold: 0.2,
+  glideMinHz: 20,
+  qualityDurationWeight: 0.8,
+  qualityGlideBonus: 0.2,
+  scoreQualityWeight: 0.6,
+  scoreTimeWeight: 0.4,
+  rankS: 0.8, rankA: 0.6, rankB: 0.35,
+  labelHoldMs: 500,
+  winRevealMs: 900,
   catStartPos: 50 // 0 = fully off-screen (lose), 100 = reached player (win)
 };
 
@@ -215,136 +251,160 @@ const endTitle = document.getElementById('endTitle');
 const endMsg = document.getElementById('endMsg');
 const endStats = document.getElementById('endStats');
 const endRetryBtn = document.getElementById('endRetryBtn');
+const gameStatus = document.getElementById('gameStatus');
+const restartBtn = document.getElementById('restartBtn');
+const newBest = document.getElementById('newBest');
+const shareHint = document.getElementById('shareHint');
 const BEST_TIME_KEY = 'meowme_best_time';
 
 if (DEBUG) debugPanel.classList.add('on');
 
 // ===== Audio pipeline (Step 1) =====
-let audioCtx, analyser, timeData;
+let audioCtx, analyser, timeData, mediaStream, frameId = 0;
 let noiseFloor = 0.01;
 let minVol, scareVol;
+let isStarting = false, pauseStartedAt = 0, finalCompletionTime = 0;
 
+function focusSoon(el) { setTimeout(() => el.focus(), 0); }
+function setGameStatus(text) { if (gameStatus.textContent !== text) gameStatus.textContent = text; }
+function stopAudio() {
+  cancelAnimationFrame(frameId);
+  frameId = 0;
+  mediaStream?.getTracks().forEach(track => track.stop());
+  mediaStream = undefined; analyser = undefined; timeData = undefined;
+  if (audioCtx && audioCtx.state !== 'closed') audioCtx.close();
+  audioCtx = undefined;
+}
 function showError(title, msg, showCopyLink) {
+  stopAudio();
   landing.style.display = 'none';
   errorScreen.style.display = 'flex';
   errorTitle.textContent = title;
   errorMsg.textContent = msg;
   copyLinkBtn.style.display = showCopyLink ? 'inline-block' : 'none';
+  focusSoon(errorTitle);
 }
-
-copyLinkBtn.addEventListener('click', () => {
-  navigator.clipboard?.writeText(location.href).then(() => {
-    copyLinkBtn.textContent = 'Copied! ✅';
-    setTimeout(() => { copyLinkBtn.textContent = 'Copy link 📋'; }, 1500);
-  });
+copyLinkBtn.addEventListener('click', async () => {
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+    await navigator.clipboard.writeText(location.href);
+    copyLinkBtn.textContent = 'Copied!';
+    setTimeout(() => { copyLinkBtn.textContent = 'Copy link'; }, 1500);
+  } catch { copyLinkBtn.textContent = 'Use your address bar to copy'; }
 });
 
 async function startAudio() {
+  if (isStarting || gameState === 'playing' || gameState === 'calibrating') return;
+  isStarting = true;
+  startBtn.disabled = true;
+  startBtn.textContent = 'Starting...';
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     const isLineUA = /Line/i.test(navigator.userAgent);
     const msg = isLineUA
       ? 'LINE\'s in-app browser can\'t access the microphone. Copy this link and open it in Chrome or Safari instead.'
       : 'Your browser can\'t access the microphone. Try opening this page in Chrome or Safari (not an in-app browser like LINE).';
+    isStarting = false; startBtn.disabled = false; startBtn.textContent = 'Start meowing';
     showError('No mic support', msg, true);
     return;
   }
-  let stream;
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      audio: { autoGainControl: false, noiseSuppression: false, echoCancellation: false }
-    });
-  } catch (err) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    await audioCtx.resume();
+    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: { autoGainControl: false, noiseSuppression: false, echoCancellation: false } });
+  } catch {
+    isStarting = false; startBtn.disabled = false; startBtn.textContent = 'Start meowing';
     showError('Mic access denied', 'Meow Me needs your microphone to hear you. Please allow mic access and try again.');
     return;
   }
-
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  await audioCtx.resume();
-  const source = audioCtx.createMediaStreamSource(stream);
+  const source = audioCtx.createMediaStreamSource(mediaStream);
   analyser = audioCtx.createAnalyser();
   analyser.fftSize = 2048;
   timeData = new Float32Array(analyser.fftSize);
   source.connect(analyser);
-
   landing.style.display = 'none';
   scene.style.display = 'block';
   gameState = 'calibrating';
+  catPos = CONFIG.catStartPos;
+  renderScene(0);
+  setGameStatus('Listening to the room...');
   await calibrate();
+  if (!analyser) return;
   startGame();
-  requestAnimationFrame(frameLoop);
+  isStarting = false; startBtn.disabled = false; startBtn.textContent = 'Start meowing';
+  frameId = requestAnimationFrame(frameLoop);
 }
 
 // ===== Game state machine (Step 3) =====
 // States: landing -> calibrating -> playing -> won | lost.
 let gameState = 'landing';
 let catPos = 0, roundStartAt = 0, lastGoodMeowAt = 0, lastTickAt = 0;
-
-let totalQuality = 0, meowCountForScore = 0;
+let totalQuality = 0, meowCountForScore = 0, lastLossMessage = '';
 
 function startGame() {
   catPos = CONFIG.catStartPos;
   roundStartAt = performance.now();
   lastGoodMeowAt = roundStartAt;
   lastTickAt = roundStartAt;
-  totalQuality = 0;
-  meowCountForScore = 0;
+  totalQuality = 0; meowCountForScore = 0;
+  meowActive = false; meowPitches = []; lastRawLabel = 'silence'; heldLabel = 'silence'; pauseStartedAt = 0;
   catWrap.classList.remove('happy', 'scared', 'walking');
   catWrap.querySelectorAll('.heart').forEach(h => h.remove());
-  endScreen.style.display = 'none';
-  scene.style.display = 'block';
+  endScreen.style.display = 'none'; scene.style.display = 'block';
   gameState = 'playing';
+  setGameStatus('Meow to call the cat. Keep it gentle.');
 }
-
 function endRound(result) {
+  if (gameState !== 'playing') return;
   gameState = result;
   if (result === 'won') {
-    spawnHearts();
-    setTimeout(() => showEndScreen('won'), 900);
+    finalCompletionTime = (performance.now() - roundStartAt) / 1000;
+    stopAudio(); spawnHearts();
+    setTimeout(() => showEndScreen('won', finalCompletionTime), matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : CONFIG.winRevealMs);
   } else {
-    showEndScreen('lost');
+    lastLossMessage = (performance.now() - roundStartAt) / 1000 >= CONFIG.roundSec ? 'Time\'s up. Gentler, longer meows next time.' : 'The cat got bored. Keep calling it back.';
+    stopAudio(); showEndScreen('lost');
   }
 }
-
 function checkWinLose() {
   if (gameState !== 'playing') return;
   if (catPos >= 100) endRound('won');
   else if (catPos <= 0) endRound('lost');
 }
-
-function showEndScreen(result) {
-  scene.style.display = 'none';
-  endScreen.style.display = 'flex';
+function rankForScore(score) { return score >= CONFIG.rankS ? 'S' : score >= CONFIG.rankA ? 'A' : score >= CONFIG.rankB ? 'B' : 'C'; }
+function readBestTime() { try { return parseFloat(localStorage.getItem(BEST_TIME_KEY)); } catch { return NaN; } }
+function saveBestTime(time) { try { localStorage.setItem(BEST_TIME_KEY, time.toFixed(2)); } catch {} }
+function showEndScreen(result, completionTimeSec) {
+  scene.style.display = 'none'; endScreen.style.display = 'flex';
   if (result === 'won') {
-    const completionTimeSec = (performance.now() - roundStartAt) / 1000;
     const avgQuality = meowCountForScore ? totalQuality / meowCountForScore : 0;
     const timeBonus = Math.max(0, Math.min(1, 1 - completionTimeSec / CONFIG.roundSec));
-    const score = avgQuality * 0.6 + timeBonus * 0.4;
-    const rank = score >= 0.8 ? 'S' : score >= 0.6 ? 'A' : score >= 0.35 ? 'B' : 'C';
-    const titles = {
-      S: 'ทาสแมวตัวจริง 🏆',
-      A: 'Certified Cat Whisperer',
-      B: 'The cat tolerates you',
-      C: 'แมวมาเพราะสงสาร 😹'
-    };
-
-    const prevBest = parseFloat(localStorage.getItem(BEST_TIME_KEY));
-    const isNewBest = isNaN(prevBest) || completionTimeSec < prevBest;
-    if (isNewBest) localStorage.setItem(BEST_TIME_KEY, completionTimeSec.toFixed(2));
-    const bestTime = isNewBest ? completionTimeSec : prevBest;
-
+    const rank = rankForScore(avgQuality * CONFIG.scoreQualityWeight + timeBonus * CONFIG.scoreTimeWeight);
+    const titles = { S: 'ทาสแมวตัวจริง 🏆', A: 'Certified Cat Whisperer', B: 'The cat tolerates you', C: 'แมวม่าเพราะสงสาร 😹' };
+    const prevBest = readBestTime(), isNewBest = isNaN(prevBest) || completionTimeSec < prevBest, bestTime = isNewBest ? completionTimeSec : prevBest;
+    if (isNewBest) saveBestTime(completionTimeSec);
     endScreen.style.setProperty('--rank-color', `var(--rank-${rank})`);
-    endTitle.textContent = `You win! 🐱 Rank ${rank}`;
-    endMsg.textContent = titles[rank];
+    endTitle.textContent = `You win! Rank ${rank}`;
+    endMsg.removeAttribute('lang');
+    endMsg.textContent = titles[rank]; newBest.hidden = !isNewBest; shareHint.hidden = false;
     endStats.textContent = `Time: ${completionTimeSec.toFixed(1)}s — Best: ${bestTime.toFixed(1)}s`;
   } else {
-    endScreen.style.removeProperty('--rank-color');
-    endTitle.textContent = 'The cat ignored you 😾';
-    endMsg.textContent = 'แมวไม่สนใจคุณ';
-    endStats.textContent = '';
+    endScreen.style.removeProperty('--rank-color'); endTitle.textContent = 'The cat ignored you';
+    endMsg.lang = 'th';
+    endMsg.textContent = 'แมวไม่สนใจคุณ'; newBest.hidden = true; shareHint.hidden = true; endStats.textContent = lastLossMessage;
   }
+  focusSoon(endTitle);
 }
-
-endRetryBtn.addEventListener('click', startGame);
+endRetryBtn.addEventListener('click', startAudio);
+restartBtn.addEventListener('click', () => {
+  stopAudio();
+  isStarting = false;
+  startBtn.disabled = false;
+  startBtn.textContent = 'Start meowing';
+  gameState = 'landing';
+  scene.style.display = 'none';
+  landing.style.display = 'flex';
+  focusSoon(landing.querySelector('h1'));
+});
 
 let catAnimTimeout;
 function setCatAnim(cls, durationMs) {
@@ -396,7 +456,7 @@ function renderScene(volume) {
 function gameTick(now) {
   const dt = (now - lastTickAt) / 1000;
   lastTickAt = now;
-  if (gameState !== 'playing') return;
+  if (pauseStartedAt || gameState !== 'playing') return;
 
   if ((now - roundStartAt) / 1000 >= CONFIG.roundSec) { endRound('lost'); return; }
   if ((now - lastGoodMeowAt) / 1000 > CONFIG.driftAfterSec) {
@@ -438,11 +498,8 @@ function rms(buf) {
 // Autocorrelation pitch detection (standard ACF approach).
 function detectPitch(buf, sampleRate) {
   const size = buf.length;
-  let rmsVal = rms(buf);
-  if (rmsVal < minVol) return -1; // below speech threshold, skip pitch work
-
   let r1 = 0, r2 = size - 1;
-  const threshold = 0.2;
+  const threshold = CONFIG.pitchTrimThreshold;
   for (let i = 0; i < size / 2; i++) if (Math.abs(buf[i]) > threshold) { r1 = i; break; }
   for (let i = 1; i < size / 2; i++) if (Math.abs(buf[size - i]) > threshold) { r2 = size - i; break; }
   const trimmed = buf.slice(r1, r2);
@@ -504,68 +561,70 @@ function updateMeowTracking(label, pitch, now) {
   if (!meowActive) return;
   meowActive = false;
   const durationSec = (now - meowStartTime) / 1000;
-  if (durationSec < CONFIG.meowMinSec || durationSec > CONFIG.meowMaxSec) return;
-  if ((now - lastCountedMeowAt) / 1000 < CONFIG.cooldownSec) return;
+  if (durationSec < CONFIG.meowMinSec) { setGameStatus('Try a longer meow.'); return; }
+  if (durationSec > CONFIG.meowMaxSec) { setGameStatus('Try a shorter meow.'); return; }
+  if ((now - lastCountedMeowAt) / 1000 < CONFIG.cooldownSec) { setGameStatus('Let the cat listen...'); return; }
 
   const n = meowPitches.length;
   const glideHz = n >= 2 ? meowPitches[n - 1] - meowPitches[0] : 0;
-  const glide = Math.abs(glideHz) >= 20; // 20Hz+ contour shift counts as a glide
+  const glide = Math.abs(glideHz) >= CONFIG.glideMinHz;
   const mid = (CONFIG.meowMinSec + CONFIG.meowMaxSec) / 2;
   const halfRange = (CONFIG.meowMaxSec - CONFIG.meowMinSec) / 2;
   const durationFit = 1 - Math.min(1, Math.abs(durationSec - mid) / halfRange);
-  const quality = Math.min(1, durationFit * 0.8 + (glide ? 0.2 : 0));
+  const quality = Math.min(1, durationFit * CONFIG.qualityDurationWeight + (glide ? CONFIG.qualityGlideBonus : 0));
 
   lastCountedMeowAt = now;
   const evt = { duration: +durationSec.toFixed(2), glide, quality: +quality.toFixed(2) };
   onMeowEvent(evt);
   applyGoodMeow(evt);
+  setGameStatus(glide ? 'Nice meow! The cat likes that.' : 'Nice meow!');
 }
 
 function frameLoop() {
+  if (!analyser || !timeData || !audioCtx) return;
   analyser.getFloatTimeDomainData(timeData);
   const volume = rms(timeData);
-  const pitch = detectPitch(timeData, audioCtx.sampleRate);
+  const pitch = volume >= minVol ? detectPitch(timeData, audioCtx.sampleRate) : -1;
   const label = classify(volume, pitch);
-
   const now = performance.now();
-  updateMeowTracking(label, pitch, now);
-  if (label === 'scream' && lastRawLabel !== 'scream') applyScream();
-  lastRawLabel = label;
-  gameTick(now);
-  renderScene(volume);
+  if (!pauseStartedAt) updateMeowTracking(label, pitch, now);
+  if (!pauseStartedAt && label === 'scream' && lastRawLabel !== 'scream') { setGameStatus('Too loud! The cat got scared.'); applyScream(); }
+  lastRawLabel = label; gameTick(now); renderScene(volume);
   if (volume > peakVol || now - peakAt > 3000) { peakVol = volume; peakAt = now; }
-
-  // Hold the loudest label briefly so a short scream/meow doesn't flash past
-  // faster than the eye can read it (labels update ~60x/sec).
   const labelRank = { silence: 0, talk: 1, meow: 2, scream: 3 };
-  if (labelRank[label] >= labelRank[heldLabel] || now - heldAt > 500) {
-    heldLabel = label;
-    heldAt = now;
-  }
-
+  if (labelRank[label] >= labelRank[heldLabel] || now - heldAt > CONFIG.labelHoldMs) { heldLabel = label; heldAt = now; }
   if (DEBUG) {
-    dbgLabel.textContent = heldLabel;
-    dbgVol.textContent = volume.toFixed(4);
+    dbgLabel.textContent = heldLabel; dbgVol.textContent = volume.toFixed(4);
     dbgVolBar.style.width = Math.min(100, (volume / scareVol) * 100) + '%';
     dbgPitch.textContent = pitch > 0 ? Math.round(pitch) : '-';
     document.getElementById('dbgPeak').textContent = peakVol.toFixed(4);
     document.getElementById('dbgGameState').textContent = gameState;
     document.getElementById('dbgCatPos').textContent = Math.round(catPos);
-    const timeLeft = gameState === 'playing'
-      ? Math.max(0, CONFIG.roundSec - (now - roundStartAt) / 1000)
-      : 0;
-    document.getElementById('dbgTimeLeft').textContent = Math.round(timeLeft);
+    document.getElementById('dbgTimeLeft').textContent = Math.round(gameState === 'playing' ? Math.max(0, CONFIG.roundSec - (now - roundStartAt) / 1000) : 0);
   }
-
-  requestAnimationFrame(frameLoop);
+  if (gameState === 'playing') frameId = requestAnimationFrame(frameLoop);
 }
 
 if (DEBUG) {
+  console.assert(rankForScore(CONFIG.rankS) === 'S', 'S rank boundary failed');
+  console.assert(rankForScore(CONFIG.rankA) === 'A', 'A rank boundary failed');
+  console.assert(rankForScore(CONFIG.rankB) === 'B', 'B rank boundary failed');
   document.addEventListener('keydown', e => {
     if (e.key === 'm') applyGoodMeow({ duration: 0.6, glide: true, quality: 1 });
     if (e.key === 's') applyScream();
   });
 }
+
+document.addEventListener('visibilitychange', () => {
+  if (gameState !== 'playing') return;
+  const now = performance.now();
+  if (document.hidden) { pauseStartedAt = now; setGameStatus('Paused while you are away.'); }
+  else if (pauseStartedAt) {
+    const pausedFor = now - pauseStartedAt;
+    roundStartAt += pausedFor; lastGoodMeowAt += pausedFor; lastTickAt += pausedFor;
+    pauseStartedAt = 0; setGameStatus('Welcome back - meow!');
+  }
+});
 
 startBtn.addEventListener('click', startAudio, { once: false });
 retryBtn.addEventListener('click', () => {

@@ -1,36 +1,61 @@
-# HANDSON.md — pick up here next session
+﻿# HANDSON.md — implementation handoff
 
-## Where we left off
+## Status
 
-Game is fully built and working (all 8 PLAN.md steps done, deployed to
-`https://chanooooot.github.io/meowmany/`). Did a first visual redesign pass
-today: night-sky theme, marigold cat, styled buttons/end-screens. Confirmed
-it fits your phone screen.
+Game complete and deployed: `https://chanooooot.github.io/meowmany/`.
+Single-file app: all changes stay in `index.html`. No external assets,
+frameworks, backend, analytics, SFX, PWA, settings, levels, or leaderboard.
+Read `AGENTS.md`, `SPEC.md`, and `CLAUDE.md` before editing.
 
-## Open item: cat isn't cute enough
+## Review outcome
 
-Your words: "the cat is not cute." First redesign pass fixed *cohesion*
-(colors/theme match across screens) but not *cuteness* of the cat shape
-itself. Next session, options to explore:
+Core concept, palette, and LINE/microphone fallback copy are strong. Biggest
+gaps: audio detection is hard for players to understand; resource lifecycle
+and a few score paths need hardening; end screen misses screenshot/share
+payoff.
 
-- Rounder/chubbier body proportions (current one may read as too flat/wide)
-- Bigger head relative to body (chibi proportions read cuter)
-- Softer eye shape / bigger eyes
-- Reference a specific cute-cat style you like (screenshot or describe one)
-  so the redesign has a concrete target instead of guessing again
+## Implement in this order
 
-## Also wanted: more UX/UI revision
+1. Correctness and lifecycle
+   - Capture completion time in `endRound()` before 900ms win delay; current
+     score and best time include animation delay.
+   - Retain `MediaStream` and animation-frame ID. Stop tracks/loop on end or
+     exit; do not keep microphone and pitch detection running on end screen.
+   - Pause game timer on `visibilitychange`; resume without penalizing phone
+     interruptions.
 
-You said you still want to revise design/UX beyond just the cat. No specific
-asks captured yet — next session, worth asking directly: what specifically
-feels off? (layout, colors, animations, text, something else?)
+2. Make audio feedback legible
+   - During calibration show `Listening to the room…`.
+   - In play show one compact status: `Nice meow!`, `Too quiet`, `Too loud`,
+     or `Try a longer meow`.
+   - Label mic meter. Keep feedback playful, not technical.
 
-## Quick orientation for next session
+3. Accessibility and control
+   - Add `aria-live` game status, focus management when screens change,
+     visible `:focus-visible`, and `lang="th"` on Thai copy.
+   - Add unobtrusive Restart/Exit control during play.
+   - Use `100dvh` and safe-area padding for mobile edges.
 
-- Cat SVG lives in `index.html`, inside `<div id="catWrap">` — one `<svg
-  id="cat">` block, plain shapes (ellipses/polygons/paths), no external
-  assets.
-- Palette is all CSS custom properties in `:root` at the top of `<style>` —
-  easy to retheme without touching markup.
-- See `AGENTS.md` for full technical map of the file if a different agent
-  picks this up.
+4. End-screen payoff
+   - Show `New best!` when applicable.
+   - Add screenshot/share hint only; do not add Web Share API or share cards.
+   - Give useful loss coaching based on actual state where possible.
+
+5. Small hardening/polish
+   - Catch clipboard and `localStorage` failures.
+   - Move remaining gameplay thresholds/score cutoffs into `CONFIG`.
+   - Add debug-only `console.assert` checks for score/state boundaries.
+   - Remove repeating ground stripes; replace platform-dependent player emoji
+     with matching inline art; use palette variables in cat SVG.
+
+## Existing visual note
+
+Cat may still need a cuteness pass: chubbier body, larger head/eyes, softer
+eye shape. Preserve current marigold/indigo identity and inline SVG approach.
+
+## Verification
+
+- Test lifecycle, timing, feedback, and interruption behavior on real iPhone.
+- Test win, lose, retry, denied mic, LINE fallback, and private/restricted
+  storage/clipboard failure paths.
+- Keep `?debug=1`, `m`, and `s` shortcuts working.
