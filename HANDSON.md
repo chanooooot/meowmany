@@ -3,25 +3,29 @@
 ## Current state
 
 - Live: `https://chanooooot.github.io/meowmany/`
-- Latest implementation commit before this handoff: `a323e51`
-  (`fix(game): harden audio round flow`)
+- Latest implementation commit before this handoff: `c1c456b`
+  (`fix(a11y): 44px touch target on copy-link button, hide decorative hearts
+  from screen readers`)
 - One-file app: all game work stays in `index.html`.
 - No external assets, framework, backend, analytics, SFX, PWA, settings,
   levels, leaderboard, or share API.
 
 ## Completed this session
 
-- Fixed scoring time: win animation delay no longer inflates time or rank.
-- Mic tracks and frame loop stop after round/end/restart; Retry reacquires mic.
-- Round pauses on tab/app interruption via `visibilitychange`.
-- Added calibration and in-round feedback, mic label, Start over control,
-  focus styling, live status, safe-area-aware scene controls, and inline
-  player art.
-- Added New best and screenshot challenge copy on wins; useful loss coaching.
-- Hardened clipboard/localStorage failure paths.
-- Moved remaining game thresholds/rank values into `CONFIG`.
-- Added debug rank assertions; `?debug=1`, `m`, and `s` remain available.
-- Detector returns clean (`[]`); inline JavaScript syntax check passes.
+- A11y pass on `index.html`: `#copyLinkBtn` now meets 44px min touch target;
+  spawned heart divs marked `aria-hidden`.
+- Explored a full visual redesign (theme/animation/icons) as throwaway
+  prototypes — **not applied to `index.html`, exploration only.** Three
+  direction mockups built as standalone Artifacts (canvas-rendered, not
+  committed to repo):
+  1. **Pixel** — 30x20 grid, `image-rendering:pixelated`, blocky retro-console
+     chrome.
+  2. **Doodle** — chalkboard bg, hand-drawn linework redrawn with per-frame
+     jitter ("boil" effect), chalk-hatch UI chrome.
+  3. **Clay** — claymorphism, radial-gradient shaded blobs (no outline
+     strokes), squish-bounce animation, soft-UI double-shadow chrome.
+  All three keep the marigold-on-navy palette; only rendering technique
+  differs. User has not picked a direction yet.
 
 ## Must verify on real phone
 
@@ -34,9 +38,11 @@
 
 ## Deferred visual work
 
-Cat can still be cuter: chubbier body, larger head/eyes, softer eye shape.
-Keep marigold/indigo palette and inline SVG approach. Do not add new game
-systems until real-phone behavior above is confirmed.
+Redesign direction undecided — see the three mockups above. Next session:
+get a pick from the user, then port the chosen technique (pixel/doodle/clay)
+into `index.html`'s inline `<svg>`/CSS, replacing the current cat/player art
+and animation classes. Do not add new game systems until real-phone behavior
+above is confirmed and a redesign direction is locked in.
 
 ## Orientation
 
