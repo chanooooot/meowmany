@@ -45,7 +45,7 @@
     transition:transform .15s ease-out, box-shadow .15s ease-out;}
   #startBtn:active,#endRetryBtn:active,#retryBtn:active{transform:translateY(4px);
     box-shadow:0 2px 0 var(--marigold-deep), 0 4px 10px rgba(0,0,0,.3);}
-  #copyLinkBtn{font-size:1rem;padding:10px 22px;border-radius:999px;border:1px solid var(--muted);
+  #copyLinkBtn{font-size:1rem;padding:10px 22px;min-height:44px;border-radius:999px;border:1px solid var(--muted);
     background:transparent;color:var(--cream);}
 
   #debug{display:none;position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,.85);padding:10px;font-family:monospace;font-size:13px;z-index:10;}
@@ -419,6 +419,7 @@ function spawnHearts() {
   for (let i = 0; i < 3; i++) {
     const heart = document.createElement('div');
     heart.className = 'heart';
+    heart.setAttribute('aria-hidden', 'true');
     heart.textContent = '❤️';
     heart.style.left = (30 + i * 15) + 'px';
     heart.style.bottom = (20 + i * 5) + 'px';
