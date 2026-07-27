@@ -6,103 +6,93 @@
 <title>Meow Me 🐱</title>
 <style>
   :root{
-    --sky-top:#241a3d; --sky-mid:#2e2049; --ground:#3a2a2e;
-    --marigold:#ff9f4a; --marigold-soft:#ffd9a0; --marigold-deep:#c96b2e;
-    --cream:#fff3e2; --ink:#2a2130; --muted:#c9b8d6; --fur-stroke:#8a4a1e;
-    --rank-S:#ffd76a; --rank-A:#ff9f4a; --rank-B:#ff8fa3; --rank-C:#9aa5c9;
+    --sky-top:#8e78c9; --sky-mid:#baa8e8; --ground:#c9ecd1;
+    --marigold:#ff8a65; --marigold-soft:#ffcf8a; --marigold-deep:#e0623b;
+    --cream:#fffaf3; --ink:#3b4a4a; --muted:#4a5b57; --fur-stroke:#e0733f;
+    --rank-S:#f4b83f; --rank-A:#e98172; --rank-B:#df7fa7; --rank-C:#8d84bc;
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;height:100%;color:var(--cream);
+  html,body{margin:0;height:100%;color:var(--ink);
     font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-    background-color:var(--sky-top);
+    background-color:#d8ecff;
     background-image:
-      radial-gradient(1.6px 1.6px at 18% 22%, #fff9 50%, transparent),
-      radial-gradient(1.6px 1.6px at 68% 12%, #fff7 50%, transparent),
-      radial-gradient(1.6px 1.6px at 84% 34%, #fff9 50%, transparent),
-      radial-gradient(1.6px 1.6px at 40% 8%, #fff6 50%, transparent),
-      radial-gradient(1.6px 1.6px at 55% 28%, #fff5 50%, transparent),
-      linear-gradient(180deg, var(--sky-top), var(--sky-mid) 55%, var(--ground) 100%);
+      radial-gradient(circle at 84% 9%, #fff6d8 0%, #ffdd7a 45%, transparent 62%),
+      linear-gradient(180deg, #d8ecff 0%, #eaf6ff 55%, var(--ground) 55%);
   }
-  #moon{position:fixed;top:6%;right:9%;width:60px;height:60px;border-radius:50%;
-    background:radial-gradient(circle at 35% 35%, var(--cream), var(--marigold-soft));
-    box-shadow:0 0 44px 12px rgba(255,196,120,.28);pointer-events:none;z-index:0;}
+  #moon{position:fixed;top:9%;left:8%;width:70px;height:22px;border-radius:999px;
+    background:#fff;opacity:.85;pointer-events:none;z-index:0;}
+  #moon::after{content:"";position:fixed;top:15%;left:18%;width:50px;height:16px;
+    border-radius:999px;background:#fff;opacity:.7;pointer-events:none;}
 
   #landing,#errorScreen,#endScreen{position:relative;z-index:1;display:flex;flex-direction:column;
     align-items:center;justify-content:center;height:100%;gap:16px;text-align:center;
     padding:24px;box-sizing:border-box;}
   #errorScreen,#endScreen{display:none;}
-  #landing h1{font-size:clamp(2rem,8vw,3rem);margin:0;letter-spacing:-0.02em;text-wrap:balance;}
-  #landing p{max-width:32ch;line-height:1.5;color:var(--muted);}
+  #landing h1{font-size:clamp(2.6rem,11vw,3.6rem);margin:0;letter-spacing:-0.02em;text-wrap:balance;
+    font-weight:800;color:var(--marigold-deep);}
+  #landing p{max-width:29ch;line-height:1.55;color:var(--muted);font-weight:600;}
   #endTitle{font-size:clamp(1.6rem,7vw,2.4rem);margin:0;letter-spacing:-0.02em;
-    color:var(--rank-color, var(--marigold));text-shadow:0 0 26px color-mix(in srgb, var(--rank-color, var(--marigold)) 50%, transparent);}
+    color:var(--rank-color, var(--marigold-deep));text-shadow:0 0 26px color-mix(in srgb, var(--rank-color, var(--marigold-deep)) 50%, transparent);}
   #endMsg{color:var(--muted);}
-  #errorTitle{margin:0;}
+  #errorTitle{margin:0;color:var(--marigold-deep);}
   #errorMsg{max-width:34ch;line-height:1.5;color:var(--muted);}
 
   #startBtn,#endRetryBtn,#retryBtn{font-size:1.15rem;padding:14px 30px;border-radius:999px;border:none;
     background:linear-gradient(180deg, var(--marigold-soft), var(--marigold));
-    color:var(--ink);font-weight:700;box-shadow:0 6px 0 var(--marigold-deep), 0 10px 20px rgba(0,0,0,.35);
+    color:#5a2a12;font-weight:800;box-shadow:0 6px 0 var(--marigold-deep), 0 10px 16px rgba(160,80,40,.25);
     transition:transform .15s ease-out, box-shadow .15s ease-out;}
   #startBtn:active,#endRetryBtn:active,#retryBtn:active{transform:translateY(4px);
     box-shadow:0 2px 0 var(--marigold-deep), 0 4px 10px rgba(0,0,0,.3);}
   #copyLinkBtn{font-size:1rem;padding:10px 22px;min-height:44px;border-radius:999px;border:1px solid var(--muted);
-    background:transparent;color:var(--cream);}
+    background:transparent;color:var(--muted);}
 
-  #debug{display:none;position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,.85);padding:10px;font-family:monospace;font-size:13px;z-index:10;}
+  #debug{display:none;position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,.85);color:#fff;padding:10px;font-family:monospace;font-size:13px;z-index:10;}
   #debug .bar{height:10px;background:#333;border-radius:4px;overflow:hidden;margin:4px 0;}
   #debug .bar>div{height:100%;background:#4caf50;width:0%;}
   #debug.on{display:block;}
 
   #scene{display:none;position:relative;height:100%;overflow:hidden;z-index:1;
-    background:linear-gradient(180deg, transparent, transparent 55%, var(--ground) 55%);}
-  #scene::after{content:"";position:absolute;left:0;right:0;bottom:0;height:45%;
-    background-image:repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 2px, transparent 2px 26px);}
-  #micMeterWrap{position:absolute;top:10px;left:10px;right:10px;height:8px;background:rgba(0,0,0,.35);
+    background:linear-gradient(180deg, transparent, transparent 58%, var(--ground) 58%);}
+  #scene::after{content:"\2665  \2661  \2665  \2661  \2665";position:absolute;left:0;right:0;bottom:5%;color:rgba(255,255,255,.7);
+    font-size:1.2rem;letter-spacing:1.8rem;text-align:center;white-space:nowrap;pointer-events:none;}
+  #micMeterWrap{position:absolute;top:10px;left:10px;right:10px;height:8px;background:rgba(59,74,74,.18);
     border-radius:999px;overflow:hidden;}
   #micMeterBar{height:100%;width:0%;background:linear-gradient(90deg, var(--marigold-soft), var(--marigold));}
-  #timeLeftDisplay{position:absolute;top:24px;right:10px;font-size:14px;color:var(--cream);
-    font-variant-numeric:tabular-nums;}
-  #playerZone{position:absolute;bottom:14px;right:6%;font-size:2.4rem;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4));}
+  #timeLeftDisplay{position:absolute;top:24px;right:10px;font-size:14px;color:var(--ink);font-weight:800;font-variant-numeric:tabular-nums;}
+  #playerZone{position:absolute;bottom:14px;right:6%;filter:drop-shadow(0 5px 0 rgba(59,74,74,.16));}
   #catWrap{position:absolute;bottom:14px;transition:left .15s linear;}
   #catWrap.walking{animation:walkBob .3s ease-in-out 2;}
   #catWrap.scared{animation:scaredShake .4s ease-out;}
   #catWrap.happy{animation:catCelebrate .6s ease-in-out infinite;}
-  #cat .tail{transform-origin:14px 54px;animation:tailSway 2s ease-in-out infinite;}
+  #cat .tail{transform-origin:18px 62px;animation:tailSway 2s ease-in-out infinite;}
   #cat .eyes-scared,#cat .eyes-happy{display:none;}
   #catWrap.scared .eyes-idle{display:none;}
   #catWrap.scared .eyes-scared{display:block;}
   #catWrap.happy .eyes-idle{display:none;}
   #catWrap.happy .eyes-happy{display:block;}
-
   @keyframes tailSway{0%,100%{transform:rotate(-8deg);}50%{transform:rotate(8deg);}}
   @keyframes walkBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
-  @keyframes scaredShake{0%{transform:translateX(0) rotate(0);}20%{transform:translateX(-10px) rotate(-8deg);}
-    40%{transform:translateX(8px) rotate(6deg);}60%{transform:translateX(-6px) rotate(-4deg);}100%{transform:translateX(0) rotate(0);}}
+  @keyframes scaredShake{0%{transform:translateX(0) rotate(0);}20%{transform:translateX(-10px) rotate(-8deg);}40%{transform:translateX(8px) rotate(6deg);}60%{transform:translateX(-6px) rotate(-4deg);}100%{transform:translateX(0) rotate(0);}}
   @keyframes catCelebrate{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
   .heart{position:absolute;font-size:1.5rem;animation:heartFloat 1s ease-out forwards;pointer-events:none;}
   @keyframes heartFloat{0%{transform:translateY(0);opacity:1;}100%{transform:translateY(-60px);opacity:0;}}
-
-  @media (prefers-reduced-motion: reduce){
-    #catWrap,#catWrap.walking,#catWrap.scared,#catWrap.happy,#cat .tail,.heart{animation:none !important;}
-  }
+  @media (prefers-reduced-motion: reduce){#catWrap,#catWrap.walking,#catWrap.scared,#catWrap.happy,#cat .tail,.heart{animation:none !important;}}
   #landing,#errorScreen,#endScreen{min-height:100vh;min-height:100dvh;padding:max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));}
-  button:focus-visible{outline:3px solid var(--cream);outline-offset:4px;}
+  button:focus-visible{outline:3px solid var(--marigold-deep);outline-offset:4px;}
   button:disabled{cursor:wait;opacity:.7;}
-  #newBest{margin:0;color:var(--rank-color, var(--marigold-soft));font-weight:800;}
+  #newBest{margin:0;color:var(--rank-color, var(--marigold-deep));font-weight:800;}
   #shareHint{max-width:30ch;margin:0;color:var(--muted);font-size:.95rem;}
   #scene{min-height:100vh;min-height:100dvh;}
-  #scene::after{display:none;}
   #micMeterWrap{top:max(12px, env(safe-area-inset-top));left:max(10px, env(safe-area-inset-left));right:max(10px, env(safe-area-inset-right));}
-  #micMeterLabel{position:absolute;top:max(22px, calc(env(safe-area-inset-top) + 10px));left:max(10px, env(safe-area-inset-left));font-size:.75rem;color:var(--muted);}
+  #micMeterLabel{position:absolute;top:max(22px, calc(env(safe-area-inset-top) + 10px));left:max(10px, env(safe-area-inset-left));font-size:.75rem;color:var(--muted);font-weight:700;}
   #timeLeftDisplay{top:max(28px, calc(env(safe-area-inset-top) + 16px));right:max(10px, env(safe-area-inset-right));}
-  #gameStatus{position:absolute;top:max(46px, calc(env(safe-area-inset-top) + 34px));left:50%;width:min(28rem, calc(100% - 120px));transform:translateX(-50%);margin:0;text-align:center;color:var(--marigold-soft);font-weight:700;min-height:1.5em;}
-  #restartBtn{position:absolute;top:max(48px, calc(env(safe-area-inset-top) + 40px));right:max(10px, env(safe-area-inset-right));min-height:44px;padding:8px 14px;border:1px solid rgba(255,243,226,.45);border-radius:999px;background:rgba(36,26,61,.68);color:var(--cream);font-weight:700;}
-  #playerZone{bottom:max(14px, env(safe-area-inset-bottom));width:48px;height:68px;font-size:0;}
-  #playerZone .player-fill{fill:var(--cream);}
-  #playerZone .player-accent{fill:var(--marigold-soft);}
-  #playerZone .player-line{stroke:var(--ink);stroke-width:2;stroke-linecap:round;}
+  #gameStatus{position:absolute;top:max(46px, calc(env(safe-area-inset-top) + 34px));left:50%;width:min(28rem, calc(100% - 120px));transform:translateX(-50%);margin:0;text-align:center;color:var(--ink);font-weight:800;min-height:1.5em;}
+  #restartBtn{position:absolute;top:max(48px, calc(env(safe-area-inset-top) + 40px));right:max(10px, env(safe-area-inset-right));min-height:44px;padding:8px 14px;border:1px solid rgba(59,74,74,.3);border-radius:999px;background:rgba(255,255,255,.5);color:var(--ink);font-weight:700;}
+  #playerZone .cushion-fill{fill:var(--marigold-deep);}
+  #playerZone .cushion-accent{fill:var(--marigold);}
+  #playerZone .cushion-top{fill:var(--cream);}
   #catWrap{bottom:max(14px, env(safe-area-inset-bottom));}
-  @media (hover:hover){#startBtn:hover,#endRetryBtn:hover,#retryBtn:hover{transform:translateY(-2px);}#restartBtn:hover,#copyLinkBtn:hover{background:rgba(255,243,226,.14);}}
+  @media (hover:hover){#startBtn:hover,#endRetryBtn:hover,#retryBtn:hover{transform:translateY(-2px);}#restartBtn:hover,#copyLinkBtn:hover{background:rgba(255,255,255,.6);}}
 </style>
 </head>
 <body>
@@ -128,8 +118,8 @@
   <div>pitch: <span id="dbgPitch">-</span> Hz</div>
   <div>thresholds: min <span id="dbgMin">-</span> / scare <span id="dbgScare">-</span></div>
   <div>peak (3s): <span id="dbgPeak">0</span></div>
-  <div>meow events: <span id="dbgMeowCount">0</span> — last: <span id="dbgMeowLast">-</span></div>
-  <div>game: <span id="dbgGameState">-</span> — catPos: <span id="dbgCatPos">-</span> — time left: <span id="dbgTimeLeft">-</span>s</div>
+  <div>meow events: <span id="dbgMeowCount">0</span> - last: <span id="dbgMeowLast">-</span></div>
+  <div>game: <span id="dbgGameState">-</span> - catPos: <span id="dbgCatPos">-</span> - time left: <span id="dbgTimeLeft">-</span>s</div>
   <div>(debug keys: m = simulate meow, s = simulate scream)</div>
 </div>
 
@@ -139,53 +129,54 @@
   <div id="timeLeftDisplay" aria-hidden="true"></div>
   <p id="gameStatus" role="status" aria-live="polite">Waiting to listen...</p>
   <button id="restartBtn" type="button">Start over</button>
-  <svg id="playerZone" viewBox="0 0 48 68" aria-hidden="true">
-    <circle class="player-accent" cx="24" cy="14" r="10"/>
-    <path class="player-fill" d="M13 63V38c0-9 5-14 11-14s11 5 11 14v25z"/>
-    <path class="player-line" d="M24 24v23m-10 7 10-7 10 7m-12-30-8-6m12 6 8-6" fill="none"/>
+  <svg id="playerZone" viewBox="0 0 60 40" width="70" height="47" aria-hidden="true">
+    <ellipse class="cushion-fill" cx="30" cy="27" rx="27" ry="11"/>
+    <ellipse class="cushion-accent" cx="30" cy="24" rx="27" ry="11"/>
+    <ellipse class="cushion-top" cx="30" cy="21" rx="21" ry="8.5"/>
   </svg>
   <div id="catWrap">
-    <svg id="cat" viewBox="0 0 115 70" width="128" height="78" overflow="visible">
-      <path class="tail" d="M14,58 Q0,42 10,18" fill="none" stroke="var(--marigold)" stroke-width="7"
-        stroke-linecap="round"/>
-      <circle cx="10" cy="18" r="3.5" fill="var(--cream)"/>
+    <svg id="cat" viewBox="0 0 130 90" width="150" height="103" overflow="visible">
+      <defs>
+        <linearGradient id="furPlay" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="var(--marigold-soft)"/>
+          <stop offset="1" stop-color="var(--marigold)"/>
+        </linearGradient>
+      </defs>
+      <path class="tail" d="M18,62 Q2,44 14,18" fill="none" stroke="url(#furPlay)" stroke-width="9" stroke-linecap="round"/>
 
-      <ellipse cx="55" cy="52" rx="30" ry="16" fill="var(--marigold)" stroke="var(--fur-stroke)" stroke-width="1.5"/>
-      <ellipse cx="50" cy="59" rx="16" ry="8" fill="var(--cream)"/>
+      <ellipse cx="58" cy="56" rx="36" ry="20" fill="url(#furPlay)"/>
+      <ellipse cx="40" cy="74" rx="7" ry="5" fill="url(#furPlay)"/>
+      <ellipse cx="66" cy="76" rx="7" ry="5" fill="url(#furPlay)"/>
+      <ellipse cx="50" cy="65" rx="20" ry="10" fill="var(--cream)"/>
 
-      <circle cx="82" cy="34" r="15" fill="var(--marigold)" stroke="var(--fur-stroke)" stroke-width="1.5"/>
-      <polygon points="70,24 76,7 85,23" fill="var(--marigold)" stroke="var(--fur-stroke)" stroke-width="1.5"/>
-      <polygon points="72,21 76,12 80,20" fill="var(--marigold-soft)"/>
-      <polygon points="87,21 95,6 99,24" fill="var(--marigold)" stroke="var(--fur-stroke)" stroke-width="1.5"/>
-      <polygon points="89,19 95,11 98,21" fill="var(--marigold-soft)"/>
+      <circle cx="86" cy="38" r="23" fill="url(#furPlay)"/>
+      <path d="M70,24 Q74,2 86,14 Q80,22 70,24 Z" fill="url(#furPlay)"/>
+      <path d="M88,14 Q98,-4 108,20 Q100,22 88,14 Z" fill="url(#furPlay)"/>
+      <path d="M74,18 Q76,6 83,14 Q79,18 74,18 Z" fill="#ffc0a0"/>
+      <path d="M92,14 Q99,2 104,18 Q98,18 92,14 Z" fill="#ffc0a0"/>
 
-      <circle cx="75" cy="40" r="3.5" fill="#ff8fa3" opacity=".55"/>
-      <circle cx="92" cy="40" r="3.5" fill="#ff8fa3" opacity=".55"/>
+      <circle cx="80" cy="46" r="5.5" fill="#ff9d8a" opacity=".65"/>
+      <circle cx="99" cy="46" r="5.5" fill="#ff9d8a" opacity=".65"/>
 
       <g class="eyes-idle">
-        <circle cx="77" cy="32" r="2.2" fill="var(--ink)"/>
-        <circle cx="90" cy="32" r="2.2" fill="var(--ink)"/>
+        <ellipse cx="81" cy="36" rx="5" ry="6" fill="#fff"/><ellipse cx="81" cy="37" rx="1.6" ry="4.6" fill="#3b2418"/><circle cx="79.6" cy="34.5" r="0.9" fill="#fff"/>
+        <ellipse cx="98" cy="36" rx="5" ry="6" fill="#fff"/><ellipse cx="98" cy="37" rx="1.6" ry="4.6" fill="#3b2418"/><circle cx="96.6" cy="34.5" r="0.9" fill="#fff"/>
       </g>
       <g class="eyes-scared">
-        <circle cx="77" cy="32" r="4.5" fill="var(--cream)" stroke="var(--ink)" stroke-width="1"/>
-        <circle cx="90" cy="32" r="4.5" fill="var(--cream)" stroke="var(--ink)" stroke-width="1"/>
-        <circle cx="77" cy="32" r="1.6" fill="var(--ink)"/>
-        <circle cx="90" cy="32" r="1.6" fill="var(--ink)"/>
+        <circle cx="81" cy="36" r="5.2" fill="var(--cream)" stroke="#3b2418" stroke-width="1"/><circle cx="81" cy="36.5" r="3" fill="#3b2418"/>
+        <circle cx="98" cy="36" r="5.2" fill="var(--cream)" stroke="#3b2418" stroke-width="1"/><circle cx="98" cy="36.5" r="3" fill="#3b2418"/>
       </g>
-      <g class="eyes-happy" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none">
-        <path d="M74,32 Q77,28 80,32"/>
-        <path d="M87,32 Q90,28 93,32"/>
+      <g class="eyes-happy" stroke="#3b2418" stroke-width="2.4" stroke-linecap="round" fill="none">
+        <path d="M76,35 Q81,29 85,35"/>
+        <path d="M94,35 Q98.5,29 103,35"/>
       </g>
 
-      <polygon points="82,37 85,37 83.5,40" fill="#ff8fa3"/>
-      <path d="M83.5,40 Q83.5,43 80,43 M83.5,40 Q83.5,43 87,43" stroke="var(--ink)" stroke-width="1.3"
-        fill="none" stroke-linecap="round"/>
+      <polygon points="87,44 91,44 89,48" fill="#ff9d8a"/>
+      <path d="M89,48 Q89,52 85,52 M89,48 Q89,52 93,52" stroke="#5a3a20" stroke-width="1.4" fill="none" stroke-linecap="round"/>
 
-      <g stroke="var(--fur-stroke)" stroke-width="1" opacity=".8">
-        <line x1="66" y1="36" x2="52" y2="33"/>
-        <line x1="66" y1="40" x2="51" y2="40"/>
-        <line x1="98" y1="36" x2="112" y2="33"/>
-        <line x1="98" y1="40" x2="113" y2="40"/>
+      <g stroke="#e0733f" stroke-width="1" opacity=".8" fill="none">
+        <path d="M70,40 Q56,37 52,35"/><path d="M70,44 Q55,44 51,44"/>
+        <path d="M104,40 Q118,37 122,35"/><path d="M104,44 Q119,44 123,44"/>
       </g>
     </svg>
   </div>
@@ -201,7 +192,7 @@
 </section>
 
 <script>
-// ===== CONFIG — all tunables live here =====
+// ===== CONFIG - all tunables live here =====
 const CONFIG = {
   pitchMinHz: 150, pitchMaxHz: 600,
   meowMinSec: 0.3, meowMaxSec: 1.5,
@@ -379,14 +370,14 @@ function showEndScreen(result, completionTimeSec) {
     const avgQuality = meowCountForScore ? totalQuality / meowCountForScore : 0;
     const timeBonus = Math.max(0, Math.min(1, 1 - completionTimeSec / CONFIG.roundSec));
     const rank = rankForScore(avgQuality * CONFIG.scoreQualityWeight + timeBonus * CONFIG.scoreTimeWeight);
-    const titles = { S: 'ทาสแมวตัวจริง 🏆', A: 'Certified Cat Whisperer', B: 'The cat tolerates you', C: 'แมวม่าเพราะสงสาร 😹' };
+    const titles = { S: 'ทาสแมวตัวจริง 🏆', A: 'Certified Cat Whisperer', B: 'The cat tolerates you', C: 'แมวมาเพราะสงสาร 😹' };
     const prevBest = readBestTime(), isNewBest = isNaN(prevBest) || completionTimeSec < prevBest, bestTime = isNewBest ? completionTimeSec : prevBest;
     if (isNewBest) saveBestTime(completionTimeSec);
     endScreen.style.setProperty('--rank-color', `var(--rank-${rank})`);
     endTitle.textContent = `You win! Rank ${rank}`;
-    endMsg.removeAttribute('lang');
+    endMsg.lang = 'th';
     endMsg.textContent = titles[rank]; newBest.hidden = !isNewBest; shareHint.hidden = false;
-    endStats.textContent = `Time: ${completionTimeSec.toFixed(1)}s — Best: ${bestTime.toFixed(1)}s`;
+    endStats.textContent = `Time: ${completionTimeSec.toFixed(1)}s - Best: ${bestTime.toFixed(1)}s`;
   } else {
     endScreen.style.removeProperty('--rank-color'); endTitle.textContent = 'The cat ignored you';
     endMsg.lang = 'th';
