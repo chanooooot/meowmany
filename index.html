@@ -54,8 +54,6 @@
 
   #scene{display:none;position:relative;height:100%;overflow:hidden;z-index:1;
     background:linear-gradient(180deg, transparent, transparent 58%, var(--ground) 58%);}
-  #scene::after{content:"\2665  \2661  \2665  \2661  \2665";position:absolute;left:0;right:0;bottom:5%;color:rgba(255,255,255,.7);
-    font-size:1.2rem;letter-spacing:1.8rem;text-align:center;white-space:nowrap;pointer-events:none;}
   #micMeterWrap{position:absolute;top:10px;left:10px;right:10px;height:8px;background:rgba(59,74,74,.18);
     border-radius:999px;overflow:hidden;}
   #micMeterBar{height:100%;width:0%;background:linear-gradient(90deg, var(--marigold-soft), var(--marigold));}
@@ -99,15 +97,15 @@
 <div id="moon" aria-hidden="true"></div>
 
 <main id="landing">
-  <h1 tabindex="-1">Meow Me 🐱</h1>
+  <h1 tabindex="-1">Meow Me</h1>
   <p>Meow into your mic to coax the cat closer.<br>Scream and it runs away. No pressure, <span lang="th">ทาสแมว</span>.</p>
-  <button id="startBtn">Start meowing 🐱</button>
+  <button id="startBtn">Start meowing</button>
 </main>
 
 <section id="errorScreen" aria-labelledby="errorTitle">
   <h2 id="errorTitle" tabindex="-1">Mic trouble</h2>
   <p id="errorMsg"></p>
-  <button id="copyLinkBtn" style="display:none;">Copy link 📋</button>
+  <button id="copyLinkBtn" style="display:none;">Copy link</button>
   <button id="retryBtn">Try again</button>
 </section>
 
