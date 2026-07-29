@@ -3,8 +3,8 @@
 ## Current state
 
 - Live: `https://chanooooot.github.io/meowmany/`
-- Latest implementation commit before this handoff: `4526c29`
-  (`feat(cat): swap SVG cat art for pixel sprite sheet (idle/walk)`)
+- Latest implementation commit before this handoff: `d62e9f2`
+  (`feat(cat): add dedicated scared/fear sprite row`)
 - One-file app: all game work stays in `index.html`.
 - No external assets, framework, backend, analytics, SFX, PWA, settings,
   levels, leaderboard, or share API.
@@ -29,6 +29,15 @@
   alongside the existing `scaredShake` wrapper shake. `happy` still
   **reuses** the walk-frame row plus the bounce transform — no dedicated
   happy sprite yet.
+- Ran an over-engineering/"AI slop" pass with `ui-ux-pro-max` (design
+  review, no new deps): removed emoji-as-icon on the h1/Start/Copy-link
+  buttons and a decorative unicode heart-marquee row that read as filler
+  (`06dd8f1`); fixed the win-rank glow firing on the loss screen too
+  (gated `text-shadow` behind a `--rank-glow` var only set on a win) and
+  de-uniformed secondary-button radius from `999px` pill to `12px` so
+  full-pill stays reserved for primary CTAs (`2f29344`). Claymorphism/
+  gradient chrome direction itself was kept — user chose the minimal
+  cleanup scope, not a full pixel-art skin.
 
 ## Must verify on real phone
 
