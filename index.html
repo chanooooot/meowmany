@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Meow Me 🐱</title>
+<title>Meow Many 🐱</title>
 <style>
   :root{
     --sky-a:#7ec8f0; --sky-b:#b8e4f8; --ground:#6fbf73; --ground-deep:#4f9e58;
@@ -119,7 +119,7 @@
 </div>
 
 <main id="landing">
-  <h1 tabindex="-1">Meow Me</h1>
+  <h1 tabindex="-1">Meow Many</h1>
   <p>Meow into your mic to coax the cat closer.<br>Scream and it runs away. No pressure, <span lang="th">ทาสแมว</span>.</p>
   <button id="startBtn">Start meowing</button>
 </main>
@@ -142,7 +142,7 @@
   <div>(debug keys: m = simulate meow, s = simulate scream)</div>
 </div>
 
-<section id="scene" aria-label="Meow Me game">
+<section id="scene" aria-label="Meow Many game">
   <div id="hud">
     <div id="micMeterWrap" aria-hidden="true"><div id="micMeterBar"></div></div>
     <div id="hudRow">
@@ -276,7 +276,7 @@ async function startAudio() {
     mediaStream = await navigator.mediaDevices.getUserMedia({ audio: { autoGainControl: false, noiseSuppression: false, echoCancellation: false } });
   } catch {
     isStarting = false; startBtn.disabled = false; startBtn.textContent = 'Start meowing';
-    showError('Mic access denied', 'Meow Me needs your microphone to hear you. Please allow mic access and try again.');
+    showError('Mic access denied', 'Meow Many needs your microphone to hear you. Please allow mic access and try again.');
     return;
   }
   const source = audioCtx.createMediaStreamSource(mediaStream);

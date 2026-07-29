@@ -13,6 +13,12 @@
 
 ## Completed this session
 
+- Renamed the game from "Meow Me" to "Meow Many" in `index.html` (tab
+  title, `<h1>`, scene `aria-label`, mic-denied error copy). `SPEC.md`,
+  `PLAN.md`, `AGENTS.md`, `CLAUDE.md` still say "Meow Me" — not touched,
+  wasn't asked to; update those too if the rename should be permanent
+  project-wide, not just in the shipped page.
+
 - Redesign locked in and applied to `index.html`: sky-blue/green/marigold
   palette, sun+cloud decoration, cushion marker replacing the old human
   player figure, bilingual copy refresh. Also fixed corrupted UTF-8
