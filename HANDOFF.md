@@ -21,9 +21,14 @@
   normalized frame size) into one 520x240 sheet, embedded as a base64
   `data:` URI in a CSS custom property — stays one file, zero network
   requests. CSS `steps(4)` animation cycles frames per state.
-- `scared` and `happy` states currently **reuse** idle/walk frames plus
-  the existing whole-body shake/bounce transforms (no dedicated sprite
-  frames yet — user chose to ship now rather than block on more art).
+- `scared` now has a dedicated 4-frame sprite row (crouched, wide shocked
+  eyes, pinned-back ears, puffed tail, splayed whiskers) authored with the
+  `pixel-art-studio` skill to match the existing sprite's palette/style,
+  appended as row 3 of the same sheet (now 520x360). Wired via a new
+  `catScaredFrames` keyframe on `#catWrap.scared #cat`, playing once
+  alongside the existing `scaredShake` wrapper shake. `happy` still
+  **reuses** the walk-frame row plus the bounce transform — no dedicated
+  happy sprite yet.
 
 ## Must verify on real phone
 
@@ -33,17 +38,19 @@
 3. Check calibration and meow-feedback copy feels playful—not distracting.
 4. Recheck denied mic, LINE in-app fallback, clipboard failure, and notch/home
    indicator spacing.
-5. New: confirm the sprite cat renders correctly on real phones (base64
+5. Confirm the sprite cat renders correctly on real phones (base64
    inline image, no CORS/network dependency, but worth confirming
    `image-rendering`/animation timing feels right at actual screen size).
+6. New: trigger a scream (or `?debug=1` + `s` key) and confirm the new
+   scared-frame sprite pose shows during the shake, not a stale idle frame.
 
 ## Deferred visual work
 
-- If the user wants proper `scared`/`happy` sprite frames (not reused
-  idle/walk), get a matching 4-frame strip per state from the same
-  source (ChatGPT image gen), same crop/clean/base64 pipeline used for
-  idle/walk, then wire in analogous to the existing `catIdleFrames`/
-  `catWalkFrames` keyframes in `index.html`.
+- If the user wants a proper `happy` sprite row (not the reused walk
+  frames + bounce transform), author a matching 4-frame strip with the
+  `pixel-art-studio` skill (same approach used for the `scared` row: study
+  the existing sheet's palette/proportions, build parametrically, append
+  as row 4), then wire in analogous to `catScaredFrames` in `index.html`.
 - Three earlier throwaway redesign prototypes (pixel/doodle/clay,
   marigold-on-navy palette) were explored and **not used** — the sky/
   marigold direction implemented this session is the picked one.
