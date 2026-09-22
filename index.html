@@ -223,7 +223,7 @@ const BEST_TIME_KEY = 'meowme_best_time';
 if (DEBUG) debugPanel.classList.add('on');
 
 // ===== Audio pipeline (Step 1) =====
-let audioCtx, analyser, timeData, mediaStream, frameId = 0;
+let audioCtx, analyser, timeData, mediaStream, frameId = 0, calibrationFrameId = 0, endRevealTimeout = 0, cancelCalibration;
 let noiseFloor = 0.01;
 let minVol, scareVol;
 let isStarting = false, pauseStartedAt = 0, finalCompletionTime = 0;
@@ -232,7 +232,13 @@ function focusSoon(el) { setTimeout(() => el.focus(), 0); }
 function setGameStatus(text) { if (gameStatus.textContent !== text) gameStatus.textContent = text; }
 function stopAudio() {
   cancelAnimationFrame(frameId);
+  cancelAnimationFrame(calibrationFrameId);
+  cancelCalibration?.();
   frameId = 0;
+  calibrationFrameId = 0;
+  cancelCalibration = undefined;
+  clearTimeout(endRevealTimeout);
+  endRevealTimeout = 0;
   mediaStream?.getTracks().forEach(track => track.stop());
   mediaStream = undefined; analyser = undefined; timeData = undefined;
   if (audioCtx && audioCtx.state !== 'closed') audioCtx.close();
@@ -241,6 +247,8 @@ function stopAudio() {
 function showError(title, msg, showCopyLink) {
   stopAudio();
   landing.style.display = 'none';
+  scene.style.display = 'none';
+  endScreen.style.display = 'none';
   errorScreen.style.display = 'flex';
   errorTitle.textContent = title;
   errorMsg.textContent = msg;
@@ -259,6 +267,8 @@ copyLinkBtn.addEventListener('click', async () => {
 async function startAudio() {
   if (isStarting || gameState === 'playing' || gameState === 'calibrating') return;
   isStarting = true;
+  errorScreen.style.display = 'none';
+  endScreen.style.display = 'none';
   startBtn.disabled = true;
   startBtn.textContent = 'Starting...';
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -322,7 +332,7 @@ function endRound(result) {
   if (result === 'won') {
     finalCompletionTime = (performance.now() - roundStartAt) / 1000;
     stopAudio(); spawnHearts();
-    setTimeout(() => showEndScreen('won', finalCompletionTime), matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : CONFIG.winRevealMs);
+    endRevealTimeout = setTimeout(() => showEndScreen('won', finalCompletionTime), matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : CONFIG.winRevealMs);
   } else {
     lastLossMessage = (performance.now() - roundStartAt) / 1000 >= CONFIG.roundSec ? 'Time\'s up. Gentler, longer meows next time.' : 'The cat got bored. Keep calling it back.';
     stopAudio(); showEndScreen('lost');
@@ -434,11 +444,21 @@ function calibrate() {
   return new Promise(resolve => {
     const samples = [];
     const start = performance.now();
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      calibrationFrameId = 0;
+      if (cancelCalibration === finish) cancelCalibration = undefined;
+      resolve();
+    };
+    cancelCalibration = finish;
     function sample() {
+      if (settled || !analyser || !timeData) { finish(); return; }
       analyser.getFloatTimeDomainData(timeData);
       samples.push(rms(timeData));
       if (performance.now() - start < CONFIG.calibrationSec * 1000) {
-        requestAnimationFrame(sample);
+        calibrationFrameId = requestAnimationFrame(sample);
       } else {
         noiseFloor = Math.max(0.001, samples.reduce((a, b) => a + b, 0) / samples.length);
         minVol = Math.max(noiseFloor * CONFIG.minVolMultiplier, CONFIG.minVolFloor);
@@ -447,7 +467,7 @@ function calibrate() {
           document.getElementById('dbgMin').textContent = minVol.toFixed(4);
           document.getElementById('dbgScare').textContent = scareVol.toFixed(4);
         }
-        resolve();
+        finish();
       }
     }
     sample();
@@ -583,7 +603,11 @@ if (DEBUG) {
 document.addEventListener('visibilitychange', () => {
   if (gameState !== 'playing') return;
   const now = performance.now();
-  if (document.hidden) { pauseStartedAt = now; setGameStatus('Paused while you are away.'); }
+  if (document.hidden) {
+    pauseStartedAt = now;
+    meowActive = false; meowPitches = []; lastRawLabel = 'silence';
+    setGameStatus('Paused while you are away.');
+  }
   else if (pauseStartedAt) {
     const pausedFor = now - pauseStartedAt;
     roundStartAt += pausedFor; lastGoodMeowAt += pausedFor; lastTickAt += pausedFor;
