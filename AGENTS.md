@@ -30,7 +30,7 @@ commit/push authorizes that deployment; do not ask again.
 
 - CSS `:root` owns colors and embedded image data. Cat rows: idle, walking,
   scared, curled happy; `pixel-art/cat-upgrade/build.py` embeds checked
-  sprite-gen exports while preserving the original idle row. Walking and travel share a
+  sprite-gen exports while preserving the original idle and walk rows. Walking and travel share a
   400ms duration; scare uses a stable frame from its dedicated row. The
   approved pastel garden has rounded bushes, flowers, and pixel hearts.
   World art stays visible across screens. Results use a cream card with dark

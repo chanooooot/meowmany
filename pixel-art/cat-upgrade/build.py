@@ -1,7 +1,7 @@
 """Embed checked sprite-gen exports; runtime remains a standalone HTML file.
 
 Run with the sprite-gen virtual environment after extract, compose-atlas and
-export-pngs. The original idle row is preserved byte-for-byte at pixel level.
+export-pngs. Original idle and user-preferred walk rows are preserved pixel-for-pixel.
 """
 import base64
 import io
@@ -13,7 +13,7 @@ from PIL import Image
 HERE = Path(__file__).resolve().parent
 PAGE = HERE.parents[1] / "index.html"
 CELL = (130, 120)
-ROWS = ("walk", "scared", "happy")
+ROWS = ("scared", "happy")
 
 
 def build():
@@ -29,13 +29,17 @@ def build():
     assert idle.size == (520, 120)
     atlas = Image.new("RGBA", (520, 480))
     atlas.paste(idle, (0, 0))
-    for row, state in enumerate(ROWS, 1):
+    walk = Image.open(HERE / "walk-source.png").convert("RGBA")
+    assert walk.size == (520, 120)
+    atlas.paste(walk, (0, 120))
+    for row, state in enumerate(ROWS, 2):
         for frame in range(4):
             path = HERE / "run" / "curated" / f"{state}-frame-{frame}.png"
             image = Image.open(path).convert("RGBA")
             assert image.size == CELL and image.getbbox(), f"Invalid export: {path}"
             atlas.paste(image, (frame * CELL[0], row * CELL[1]))
     assert atlas.crop((0, 0, 520, 120)).tobytes() == idle.tobytes()
+    assert atlas.crop((0, 120, 520, 240)).tobytes() == walk.tobytes()
     output = HERE / "cat-sprite.png"
     atlas.save(output, optimize=True)
     encoded = base64.b64encode(output.read_bytes()).decode("ascii")

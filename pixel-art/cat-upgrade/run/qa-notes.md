@@ -1,5 +1,16 @@
 # Cat upgrade QA
 
+## Current walk selection
+
+User prefers the pre-upgrade walk. Runtime and `../walk-preview.gif` now use
+the exact walk row from commit `fd64618`, saved as `../walk-source.png`.
+`../build.py` preserves that row rather than installing the generated walk.
+Pixel comparison verifies that idle, scared, and happy rows are unchanged.
+Walking CSS and its 400ms travel timing are unchanged. Generated walk assets
+and their review below remain source history, not the current runtime selection.
+
+## Generated asset review
+
 Identity reference: original orange tabby idle frame, extracted with sprite-gen
 slice-sheet from the existing embedded atlas. Garden art remains the approved design.
 
