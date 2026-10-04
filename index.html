@@ -182,9 +182,9 @@ const CONFIG = {
   pitchMinHz: 100, pitchMaxHz: 900,
   meowMinSec: 0.15, meowMaxSec: 2.5, meowIdealSec: 0.9,
   minVolMultiplier: 1.5,   // minVol = noiseFloor * this
-  scareVolMultiplier: 2.0, // scareVol = noiseFloor * this
+  scareVolMultiplier: 6.0, // scareVol = noiseFloor * this
   minVolFloor: 0.0015,     // absolute floors so a quiet room can't collapse thresholds
-  scareVolFloor: 0.004,    // phone mics report much lower RMS than laptops
+  scareVolFloor: 0.006,    // phone mics report much lower RMS than laptops
   cooldownSec: 0.7,
   meowGapMs: 100,
   screamReleaseRatio: 0.8, screamReleaseMs: 300,
