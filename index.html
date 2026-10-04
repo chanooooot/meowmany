@@ -179,8 +179,8 @@
 <script>
 // ===== CONFIG - all tunables live here =====
 const CONFIG = {
-  pitchMinHz: 150, pitchMaxHz: 600,
-  meowMinSec: 0.3, meowMaxSec: 1.5,
+  pitchMinHz: 100, pitchMaxHz: 900,
+  meowMinSec: 0.15, meowMaxSec: 2.5, meowIdealSec: 0.9,
   minVolMultiplier: 1.5,   // minVol = noiseFloor * this
   scareVolMultiplier: 2.0, // scareVol = noiseFloor * this
   minVolFloor: 0.0015,     // absolute floors so a quiet room can't collapse thresholds
@@ -682,9 +682,9 @@ function updateMeowTracking(label, pitch, now) {
   const n = meowPitches.length;
   const glideHz = n >= 2 ? meowPitches[n - 1] - meowPitches[0] : 0;
   const glide = Math.abs(glideHz) >= CONFIG.glideMinHz;
-  const mid = (CONFIG.meowMinSec + CONFIG.meowMaxSec) / 2;
-  const halfRange = (CONFIG.meowMaxSec - CONFIG.meowMinSec) / 2;
-  const durationFit = 1 - Math.min(1, Math.abs(durationSec - mid) / halfRange);
+  const ideal = CONFIG.meowIdealSec;
+  const range = durationSec < ideal ? ideal - CONFIG.meowMinSec : CONFIG.meowMaxSec - ideal;
+  const durationFit = 1 - Math.min(1, Math.abs(durationSec - ideal) / range);
   const quality = Math.min(1, durationFit * CONFIG.qualityDurationWeight + (glide ? CONFIG.qualityGlideBonus : 0));
 
   lastCountedMeowAt = now;

@@ -22,8 +22,8 @@ Deploy through GitHub Pages. Audio remains local; best time is in localStorage.
   Setup stays visible with a cancel action. Stay quiet during one-second
   ambient calibration. Volume floors are tuned for phones; auto gain control,
   echo cancellation, and noise suppression remain disabled.
-- An accepted call is voiced, approximately 150–600Hz, between calibrated
-  minimum/scare volume, and 0.3–1.5 seconds long. A 100ms ending gap finalizes
+- An accepted call is voiced, approximately 100–900Hz, between calibrated
+  minimum/scare volume, and 0.15–2.5 seconds long. A 100ms ending gap finalizes
   the call; shorter interruptions are tolerated. Cooldown is 0.7 seconds
   between accepted events. A modest correlation gate filters unvoiced noise;
   this is not semantic “meow” recognition. Humming can qualify.

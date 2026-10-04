@@ -6,6 +6,11 @@
 
 **Next:** Verify actual voice feel, interruptions, and LINE fallback on iPhone Safari and Android Chrome over HTTPS.
 
+**Easier input:** Pitch acceptance widened to 100–900Hz and call duration to
+0.15–2.5s after reported pitch/length rejections. Quality still peaks at 0.9s;
+phone volume floors remain unchanged. Expanded synthetic checks cover low/high
+tones, short/long calls, and noise rejection. Actual phone feel needs verification.
+
 **Sprite update:** Matching pixel-tabby scare pose and curled sleeping win row
 embedded; original four-frame walk restored at the user's request. Sprite-gen extraction/composition checks
 and 23 gameplay regressions pass. Source and GIF previews: `pixel-art/cat-upgrade`.

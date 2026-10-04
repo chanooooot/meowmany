@@ -74,7 +74,7 @@ const tests = [
   }],
   ['separate meows remain separate; cooldown and duration limits hold', h => {
     h.run('startGame()'); meow(h,1000,900); meow(h,2200,900); assert.equal(h.run('meowCountForScore'),2);
-    meow(h,3300,100); meow(h,4000,1600); assert.equal(h.run('meowCountForScore'),2);
+    meow(h,3300,100); meow(h,4000,2600); assert.equal(h.run('meowCountForScore'),2);
     meow(h,6000,300); meow(h,6400,300); assert.equal(h.run('meowCountForScore'),3);
   }],
   ['loudness chatter is one scare and sustained quiet rearms', h => {
@@ -124,12 +124,18 @@ const tests = [
   }],
   ['periodic tones accepted; uncorrelated noise rejected', h => {
     h.run('minVol=.0015;scareVol=.004');
-    for(const hz of [155,220,300,590]) {
+    for(const hz of [110,120,155,220,300,590,750,880]) {
       h.run(`testTone=Float32Array.from({length:2048},(_,i)=>.003*Math.sin(2*Math.PI*${hz}*i/48000));testPitch=detectPitch(testTone,48000)`);
       assert.ok(Math.abs(h.run('testPitch')-hz)<3); assert.equal(h.run('classify(rms(testTone),testPitch)'),'meow');
     }
     const hits=h.run('seed=12345678;hits=0;for(let j=0;j<100;j++){const b=Float32Array.from({length:2048},()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return ((seed/4294967296)*2-1)*.003});if(classify(rms(b),detectPitch(b,48000))==="meow")hits++}hits');
     assert.equal(hits,0);
+  }],
+  ['short and long voiced calls move cat; one-second calls retain quality', h => {
+    h.run('startGame()'); meow(h,1000,200); meow(h,2000,2000);
+    assert.equal(h.run('meowCountForScore'),2); assert.equal(h.run('catPos'),66);
+    h.time(5000); h.run('startGame()'); meow(h,5000,900);
+    assert.equal(h.run('totalQuality'),.8);
   }],
   ['scream frames skip pitch computation', h => {
     h.run('startGame();minVol=.0015;scareVol=.004;audioCtx={state:"running",sampleRate:48000};timeData=new Float32Array(2048);analyser={getFloatTimeDomainData:b=>b.fill(.005)};detectPitch=()=>{throw Error("Unexpected pitch work")};frameLoop()');
