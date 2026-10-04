@@ -1,3 +1,9 @@
+# Current update
+
+Gameplay/lifecycle fixes now supersede the historical implementation details below.
+Read AGENTS.md, SPEC.md, PLAN.md, and STATUS.md for current behavior and verification.
+SFX remain deliberately absent; the shipped game remains one HTML file.
+
 # HANDOFF.md — next-session handoff
 
 ## Current state

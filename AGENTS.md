@@ -1,101 +1,72 @@
-# AGENTS.md — Meow Me
+# AGENTS.md — Meow Many
 
-Context for any agent (Codex, Claude, etc.) picking up this repo cold.
+## Product and constraints
 
-## What this is
+A single-round browser game: gentle, voiced meows lure a cat onto its bed;
+loud calls scare it back; four seconds without an accepted call starts drift.
+The timer is 60 seconds. Share the HTTPS link with friends, primarily via LINE.
+English UI with Thai rank/loss jokes. Detection is a forgiving pitch/volume
+heuristic, not semantic recognition of the word “meow”. Humming may qualify.
 
-"Meow Me" — a single-file browser game. Player meows into their mic to lure a
-cat closer across the screen; screaming scares it back; silence makes it
-drift away. Win when the cat reaches the player zone. Shared as a link via
-LINE to friends. Playful, bilingual (EN/Thai) cat-servant (ทาสแมว) humor.
+Everything shipped is in `index.html`: CSS, embedded pixel sprites, markup,
+and vanilla JavaScript. No build, runtime dependencies, external assets,
+backend, uploads, analytics, sound effects, settings, levels, leaderboard,
+PWA, or share API. Audio is processed locally. LocalStorage stores best time.
+Source sprite tooling lives in `tools/pixel-art/world/build.py`.
 
-Read `SPEC.md` (what + why, locked decisions) and `PLAN.md` (8-step build
-order with verify gates) for full background — both are still accurate.
-`CLAUDE.md` has the original build constraints (single file, CONFIG object,
-no backend, etc.) — still binding.
+`SPEC.md` describes current behavior. `PLAN.md` describes current verification
+requirements. `CLAUDE.md` has binding implementation constraints. `HANDOFF.md`
+records earlier design history; its historical verification claims are not
+proof that current code has passed device tests. `STATUS.md` tracks remaining
+verification. `REVIEW.md` preserves the review and its resolution notes.
 
-## Status
+Origin: `https://github.com/chanooooot/meowmany`. GitHub Pages deploys pushes
+to `main`, at `https://chanooooot.github.io/meowmany/`. A user instruction to
+commit/push authorizes that deployment; do not ask again.
 
-All 8 PLAN.md steps are done and verified on a real phone (not just
-localhost). Live at `https://chanooooot.github.io/meowmany/` (GitHub Pages,
-public repo, deploys automatically on push to `main`).
+## Implementation map
 
-Sound (Step 5, synthesized mrrp/scare/purr SFX) was built, tested, didn't
-play reliably on the user's device (likely iOS silent-switch), and was
-**removed entirely** at the user's request. No SFX code remains.
+- CSS `:root` owns colors and embedded image data. Cat rows: idle, walking,
+  scared; happy reuses walking frames with a bounce. World art stays visible
+  across screens. Results use a cream card with dark text and a rank accent.
+- `CONFIG` owns tunable gameplay values. **Keep the phone-tuned volume floors
+  and disabled auto gain control.** Desktop measurements cannot retune phones.
+- Audio: `startAudio`, `calibrate`, `rms`, `detectPitch`, `classify`.
+  Setup remains visible/cancellable. A session counter rejects stale async
+  work and stops mic streams granted after cancellation. Errors distinguish
+  denial, missing/busy devices, and setup failures.
+- Input: `updateMeowTracking` tolerates brief gaps, waits for an ending pause,
+  and enforces duration/cooldown. `updateScream` latches a loud event until
+  sustained quieter input rearms it. Screams discard an unfinished meow.
+- Round: `startGame`, `gameTick`, `applyGoodMeow`, `applyScream`, `endRound`.
+  Resolve deadlines before audio rewards. Reset all event gates each round.
+- Lifecycle: `stopAudio` cancels frames/calibration/reveal/animation timers
+  and stops input tracks. Track loss shows recovery. Hidden/suspended rounds
+  pause; context recovery may require the visible tap-to-resume button.
+- Rendering: `positionCat` maps progress from fully offscreen to the bed while
+  accounting for sprite width; resize updates bounds. `renderScene` updates
+  the meter and a non-announcing, inspectable timer.
+- Results: `showEndScreen` mixes average duration/glide quality with time.
+  Rank criteria and drift/scare loss reasons are explained to the player.
+  Rank title language follows the selected Thai/English text.
 
-Visuals were reworked once past the placeholder-gray-shapes stage into a
-committed "marigold cat vs. indigo night sky" look (moon + CSS starfield,
-proper cat SVG with per-state eyes, pill buttons, rank-colored win glow).
-Confirmed fitting the user's real phone screen.
+## Debug and tests
 
-## Everything is one file
+`?debug=1` shows pitch, volume, thresholds, events, and state. The label holds
+for 500ms. Debug `m`/`s` apply movement directly: they bypass detection,
+segmentation, cooldown, and scream rearming. Do not use them to verify mic feel.
 
-`index.html`. No build step, no npm, no external assets/fonts/CDN. All
-markup, CSS, inline SVG, and JS live in that one file. Keep it that way.
+Run `node tools/test-game.cjs`. It executes the shipped script with controlled
+clocks, audio, and DOM mocks; covers segmentation, penalties, deadlines,
+scoring, lifecycle cancellation, interruptions, errors, and coordinates.
+No npm install or test framework is required.
 
-## Where things live in index.html
+For Chrome layout testing, use explicitly sized iframes; a headless window
+flag alone may not reproduce a phone viewport. For real Web Audio integration
+without a mic, return a real `MediaStreamDestination` stream from the mock;
+an empty MediaStream is invalid for `createMediaStreamSource`.
 
-- `<style>` block: `:root` custom properties hold the palette
-  (`--sky-top`, `--marigold`, `--rank-S/A/B/C`, etc.) — change the look by
-  editing these, not by hunting for hardcoded colors.
-- `CONFIG` object (top of `<script>`): every tunable number — pitch range,
-  volume thresholds, timing, step sizes. **Change gameplay feel here, not
-  inline in logic.**
-- Audio pipeline: `startAudio()`, `calibrate()`, `rms()`, `detectPitch()`
-  (autocorrelation), `classify()` — turns mic input into
-  silence/talk/meow/scream per frame.
-- Meow event detection: `updateMeowTracking()` — turns per-frame
-  classifications into discrete `{duration, glide, quality}` events, gated
-  by duration range + cooldown.
-- Game state machine: `startGame()`, `endRound()`, `checkWinLose()`,
-  `gameTick()`, `applyGoodMeow()`, `applyScream()` — states are
-  `landing → calibrating → playing → won | lost`. `catPos` is 0–100 (0 =
-  off-screen/lose, 100 = reached player/win).
-- Rendering: `renderScene()` positions the cat/mic-meter/timer each frame.
-  Cat SVG has three `<g>` groups (`eyes-idle` / `eyes-scared` / `eyes-happy`)
-  toggled by CSS classes on `#catWrap` (`walking` / `scared` / `happy`).
-- Scoring: `showEndScreen()` — S/A/B/C rank from avg meow quality +
-  completion-time bonus, bilingual titles, localStorage best time
-  (`meowme_best_time`).
-- Fallbacks: `showError()` — mic-denied and no-getUserMedia (with LINE
-  in-app-browser detection + copy-link button) screens. No blank-screen
-  paths.
-
-## Debug mode
-
-`?debug=1` on the URL shows a fixed top panel: live label/volume/pitch,
-computed thresholds, meow event count, game state. Keyboard shortcuts (only
-bound in debug mode): `m` = simulate a good meow, `s` = simulate a scream —
-lets you test the state machine without 500 real meows. **Note:** these
-bypass the cooldown/duration gates in `updateMeowTracking` since they call
-`applyGoodMeow`/`applyScream` directly.
-
-## Known gotchas (learned the hard way this session)
-
-- **Mic auto-gain-control must stay disabled** (`autoGainControl: false` in
-  the `getUserMedia` constraints). With it on, talk/meow/scream all get
-  normalized to the same loudness and classification breaks.
-- **Volume thresholds are phone-tuned, not laptop-tuned.** Phone mics report
-  much lower RMS than laptops. `scareVolFloor`/`minVolFloor` in CONFIG
-  currently reflect real values measured on the user's device — don't
-  "fix" them back toward laptop-scale numbers without re-testing on a
-  phone.
-- **Debug label uses a 500ms hold** (`heldLabel`/`heldAt` in the frame
-  loop) because raw classification flickers faster than the eye can read
-  at 60fps — a real scream can classify correctly for 2 frames and still
-  look like nothing happened without this.
-- Testing on desktop via browser automation: no real mic. Mock
-  `navigator.mediaDevices.getUserMedia` to resolve with a real (silent)
-  `MediaStreamDestination` stream from an `AudioContext` — an empty/fake
-  `MediaStream` will fail when `createMediaStreamSource` runs.
-- GitHub Pages needs the repo **public** on the free plan — it's already
-  public; don't flip it private without expecting Pages to break.
-
-## Testing
-
-No real automated test suite (game logic is inherently mic-driven).
-Verification has been: manual real-phone testing for audio/gameplay feel,
-and browser-automation screenshots (with the mic mock above) for visual
-regressions. If you change audio thresholds or the state machine, the
-right verify step is a real phone, not just code review.
+Before calling device behavior verified, test actual iPhone Safari and
+Android Chrome over HTTPS: voice/glide acceptance, scream rearming, calibration,
+win/loss/retry, background/return, tap-to-resume, mic loss, LINE fallback,
+clipboard failure, notch/home-indicator spacing, and sprite rendering.

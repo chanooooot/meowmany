@@ -1,11 +1,11 @@
 # STATUS
 
-**Goal:** (one line: what done looks like)
+**Goal:** Fair, responsive single-round mic gameplay with reliable retry and recovery.
 
-**Now:** (current state, one line)
+**Now:** Review fixes implemented. 21 regression checks, Chrome layouts, and real Web Audio synthetic-stream win/cleanup verified.
 
-**Next:** (the single next step)
+**Next:** Verify actual voice feel, interruptions, and LINE fallback on iPhone Safari and Android Chrome over HTTPS.
 
-**Blocked:** (nothing / what)
+**Blocked:** No implementation blocker. Real-device audio/LINE verification needs actual phones.
 
-_Updated: 2026-09-19_
+_Updated: 2026-10-04_
