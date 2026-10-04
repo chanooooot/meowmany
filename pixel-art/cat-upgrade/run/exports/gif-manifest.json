@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "kind": "sprite-gen-gif-run",
+  "run_dir": "C:\\Users\\chano\\Desktop\\Claude Project\\meowmany\\pixel-art\\cat-upgrade\\run",
+  "exports": [
+    {
+      "state": "walk",
+      "output": "C:\\Users\\chano\\Desktop\\Claude Project\\meowmany\\pixel-art\\cat-upgrade\\run\\exports\\walk.gif",
+      "frames": 4,
+      "fps": 10.0,
+      "loop": true,
+      "gif_report": {
+        "path": "C:\\Users\\chano\\Desktop\\Claude Project\\meowmany\\pixel-art\\cat-upgrade\\run\\exports\\walk.gif",
+        "frames": 4,
+        "delay_ticks": [
+          10,
+          10,
+          10,
+          10
+        ],
+        "loop": 0,
+        "transparent": true,
+        "disposal": [
+          2,
+          2,
+          2,
+          2
+        ]
+      }
+    },
+    {
+      "state": "scared",
+      "output": "C:\\Users\\chano\\Desktop\\Claude Project\\meowmany\\pixel-art\\cat-upgrade\\run\\exports\\scared.gif",
+      "frames": 4,
+      "fps": 8.0,
+      "loop": false,
+      "gif_report": {
+        "path": "C:\\Users\\chano\\Desktop\\Claude Project\\meowmany\\pixel-art\\cat-upgrade\\run\\exports\\scared.gif",
+        "frames": 4,
+        "delay_ticks": [
+          12,
+          12,
+          12,
+          12
+        ],
+        "loop": 0,
+        "transparent": true,
+        "disposal": [
+          2,
+          2,
+          2,
+          2
+        ]
+      }
+    },
+    {
+      "state": "happy",
+      "output": "C:\\Users\\chano\\Desktop\\Claude Project\\meowmany\\pixel-art\\cat-upgrade\\run\\exports\\happy.gif",
+      "frames": 4,
+      "fps": 3.0,
+      "loop": true,
+      "gif_report": {
+        "path": "C:\\Users\\chano\\Desktop\\Claude Project\\meowmany\\pixel-art\\cat-upgrade\\run\\exports\\happy.gif",
+        "frames": 4,
+        "delay_ticks": [
+          33,
+          33,
+          33,
+          33
+        ],
+        "loop": 0,
+        "transparent": true,
+        "disposal": [
+          2,
+          2,
+          2,
+          2
+        ]
+      }
+    }
+  ]
+}

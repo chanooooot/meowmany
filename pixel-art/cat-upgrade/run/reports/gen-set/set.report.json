@@ -1,0 +1,25 @@
+{
+  "kind": "sprite-gen-gen-set-report",
+  "run_dir": "C:\\Users\\chano\\Desktop\\Claude Project\\meowmany\\pixel-art\\cat-upgrade\\run",
+  "states": [
+    "walk"
+  ],
+  "ok": 1,
+  "failed": [],
+  "not_started": [],
+  "items": [
+    {
+      "state": "walk",
+      "out": "C:\\Users\\chano\\Desktop\\Claude Project\\meowmany\\pixel-art\\cat-upgrade\\run\\raw\\walk.png",
+      "report": "C:\\Users\\chano\\Desktop\\Claude Project\\meowmany\\pixel-art\\cat-upgrade\\run\\reports\\gen-set\\walk.json",
+      "refs": [
+        "C:\\Users\\chano\\Desktop\\Claude Project\\meowmany\\pixel-art\\cat-upgrade\\run\\base-source.png",
+        "C:\\Users\\chano\\Desktop\\Claude Project\\meowmany\\pixel-art\\cat-upgrade\\run\\references\\layout-guides\\walk.png"
+      ],
+      "provider": "codex",
+      "provider_resolved_from": "explicit",
+      "elapsed_seconds": 72.9,
+      "ok": true
+    }
+  ]
+}

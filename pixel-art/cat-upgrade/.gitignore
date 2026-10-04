@@ -1,0 +1,3 @@
+# Transient sprite-gen publication locks.
+.*.sg-rwlock
+.sprite-gen.lock

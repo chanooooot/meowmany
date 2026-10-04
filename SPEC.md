@@ -63,7 +63,8 @@ and wandering. Keep rank color in a readable letter badge with dark text.
 
 The approved visual direction is a pastel pixel garden: raised cat/bed/path,
 rounded bush clusters, small flowers, crisp buttons/cards, and pixel hearts.
-Walking and travel share a 400ms step; success rests using idle/blink frames.
+Walking and travel share a 400ms step; success uses a dedicated curled sleeping
+row. Scared reactions preserve the same tabby identity and pixel style.
 The source/approved prototype lives in pixel-art/design-preview; runtime art
 is embedded in index.html.
 

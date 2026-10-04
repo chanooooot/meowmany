@@ -1,0 +1,38 @@
+{
+  "cell": {
+    "width": 130,
+    "height": 120,
+    "safe_margin_x": 4,
+    "safe_margin_y": 4
+  },
+  "style": "Match the attached orange tabby pixel cat exactly: warm orange coat, dark tabby stripes, cream muzzle/chest/paws, pink inner ears, crisp dark outline, same pixel block size and shading. Same character in every state. Right-facing three-quarter side view. No smooth vector rendering, no extra accessories.",
+  "fit": {
+    "resample": "kcentroid",
+    "align_x": "foot-centroid",
+    "align_y": "bottom",
+    "ground_frames": true,
+    "pixel_unfake": true,
+    "logical_height": 60,
+    "palette_size": 24
+  },
+  "states": {
+    "walk": {
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "action": "A four-frame RIGHT-FACING WALK cycle, NOT four variations of the same stance. Pose 1: long stretched stance with near front paw forward to the right and near back paw behind to left. Pose 2: narrow crossed passing stance, near front paw moves backward beneath chest. Pose 3: REVERSE stance: near front leg visibly slopes BACKWARD LEFT from shoulder toward belly, its white paw planted under belly; near back leg slopes FORWARD RIGHT from hip. Far front leg extends forward RIGHT instead. Pose 4: second crossed passing stance, near front paw swings forward while far front paw swings backward. Critical: frame 3 white front paw must be visibly FARTHER LEFT than frame 1 white front paw. Frames 1 and 3 are opposite strides. Same head and torso size, rightward gaze and calm face; no body translation or shadows. Four paws only. Preserve detailed pixel artwork, no smooth cartoon. Seamless loop."
+    },
+    "scared": {
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "action": "Startle reaction of the SAME detailed pixel tabby: frame 1 ears turn outward, frame 2 ears flatten and eyes widen, frame 3 held frightened low crouch with flattened ears, wide dark eyes with cream highlights and puffed striped tail, frame 4 slight recovery while still wary. Keep orange tabby markings, cream muzzle, proper paws and pixel outline; never replace it with a smooth round cartoon. Frame 3 is the readable static gameplay scare pose."
+    },
+    "happy": {
+      "frames": 4,
+      "fps": 3,
+      "loop": true,
+      "action": "All four frames show the SAME cat sleeping curled low on its invisible bed, right-facing head resting on cream front paws, closed relaxed eyes, striped tail wrapped around body. Subtle breathing only; first and last match for seamless loop. Keep a low oval silhouette around half the standing height while retaining original head size and coat detail. Draw cat only, no bed, hearts, symbols or shadows."
+    }
+  }
+}

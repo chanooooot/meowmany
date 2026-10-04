@@ -1,0 +1,124 @@
+{
+  "ok": true,
+  "engine": "component-row",
+  "kind": "sprite-gen-inspect-report",
+  "run_dir": "C:\\Users\\chano\\Desktop\\Claude Project\\meowmany\\pixel-art\\cat-upgrade\\run",
+  "states": [
+    "walk",
+    "scared",
+    "happy"
+  ],
+  "thresholds": {
+    "histogram_min": 0.0,
+    "dhash_min": 0.55,
+    "motion_min": 0.01
+  },
+  "rows": [
+    {
+      "state": "walk",
+      "source": "frames",
+      "expected_frames": 4,
+      "found_frames": 4,
+      "natural_pose_count": 4,
+      "frame_files": [
+        "frames/walk/frame-0.png",
+        "frames/walk/frame-1.png",
+        "frames/walk/frame-2.png",
+        "frames/walk/frame-3.png"
+      ],
+      "metrics": {
+        "histogram_intersection": {
+          "min": 0.9596198539176627,
+          "mean": 0.9714831866531568
+        },
+        "dhash_similarity": {
+          "min": 0.890625,
+          "mean": 0.921875
+        },
+        "motion_presence": 0.041769987617442814,
+        "centroid_sigma": {
+          "x": 0.3038425852032417,
+          "y": 0.9019257617901997
+        }
+      },
+      "ok": true,
+      "errors": [],
+      "warnings": [
+        "walk: dropped 1 collapsed per-frame pitch(es) below 6.20",
+        "walk: dropped 1 collapsed per-frame pitch(es) below 6.17",
+        "walk: frame 1 own pitch 5.00x5.00 is outside the consensus pitch family 10.08x10.27 — harmonic/collapsed misdetection; snapped at consensus"
+      ]
+    },
+    {
+      "state": "scared",
+      "source": "frames",
+      "expected_frames": 4,
+      "found_frames": 4,
+      "natural_pose_count": 4,
+      "frame_files": [
+        "frames/scared/frame-0.png",
+        "frames/scared/frame-1.png",
+        "frames/scared/frame-2.png",
+        "frames/scared/frame-3.png"
+      ],
+      "metrics": {
+        "histogram_intersection": {
+          "min": 0.925827723616566,
+          "mean": 0.9503324255350061
+        },
+        "dhash_similarity": {
+          "min": 0.46875,
+          "mean": 0.5989583333333334
+        },
+        "motion_presence": 0.1832064759497549,
+        "centroid_sigma": {
+          "x": 3.0183815248660713,
+          "y": 4.958216270183893
+        }
+      },
+      "ok": true,
+      "errors": [],
+      "warnings": [
+        "scared: dHash silhouette similarity is low (0.469 < 0.550)"
+      ]
+    },
+    {
+      "state": "happy",
+      "source": "frames",
+      "expected_frames": 4,
+      "found_frames": 4,
+      "natural_pose_count": 4,
+      "frame_files": [
+        "frames/happy/frame-0.png",
+        "frames/happy/frame-1.png",
+        "frames/happy/frame-2.png",
+        "frames/happy/frame-3.png"
+      ],
+      "metrics": {
+        "histogram_intersection": {
+          "min": 0.971980868465602,
+          "mean": 0.9830635688571295
+        },
+        "dhash_similarity": {
+          "min": 0.96875,
+          "mean": 0.984375
+        },
+        "motion_presence": 0.025538465711805555,
+        "centroid_sigma": {
+          "x": 0.22943906499111283,
+          "y": 0.4949123802421655
+        }
+      },
+      "ok": true,
+      "errors": [],
+      "warnings": []
+    }
+  ],
+  "errors": [],
+  "warnings": [
+    "walk: dropped 1 collapsed per-frame pitch(es) below 6.20",
+    "walk: dropped 1 collapsed per-frame pitch(es) below 6.17",
+    "walk: frame 1 own pitch 5.00x5.00 is outside the consensus pitch family 10.08x10.27 — harmonic/collapsed misdetection; snapped at consensus",
+    "scared: dHash silhouette similarity is low (0.469 < 0.550)"
+  ]
+}
