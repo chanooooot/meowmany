@@ -54,16 +54,24 @@ A 0.6, B 0.35, otherwise C. Titles remain playful, with Thai S/C jokes and
 English A/B titles. Best time stores successful completion times only.
 
 Teach “gentle meow for about a second, then pause”. Show candidate, rejection,
-glide bonus, and wandering feedback without unreadable frame flicker. Explain
+accepted step (+8/+12), and wandering feedback in a bubble above the cat,
+without unreadable frame flicker. Meter bands follow calibrated thresholds. Explain
 rank improvement on results. Loss guidance distinguishes timeout, scares,
-and wandering. Keep rank color as an accent around readable dark text.
+and wandering. Keep rank color in a readable letter badge with dark text.
 
 ## Screens and accessibility
+
+The approved visual direction is a pastel pixel garden: raised cat/bed/path,
+rounded bush clusters, small flowers, crisp buttons/cards, and pixel hearts.
+Walking and travel share a 400ms step; success rests using idle/blink frames.
+The source/approved prototype lives in pixel-art/design-preview; runtime art
+is embedded in index.html.
 
 Landing has the cat/world, short instructions, and Start. Starting/calibration
 show status and Start over. Play shows mic meter, inspectable countdown,
 status, and Start over; interrupted audio shows Tap to resume mic. Results
-use a readable card with rank/time/best/tip/retry and a screenshot hint.
+use a readable card with rank badge/time/best/tip/retry and a screenshot hint.
+Short landscape hides decorative headings and the rank tip to keep controls visible.
 
 Errors explain unsupported/in-app browsers, permission denial, missing/busy
 mics, and setup/interruption failures. Copy-link fallback handles clipboard

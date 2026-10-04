@@ -155,3 +155,14 @@ Resolution update (2026-10-04):
 - Finding 16: current specification, plan, agent instructions, status, and handoff now agree. The app remains one embedded-asset HTML file with no runtime dependencies, audio uploads, or SFX.
 
 Verification: the retained Node harness passes 21 regression checks. Chrome checks phone/landscape layout, result readability, cat bounds, and visible short-screen retry. A real Web Audio synthetic-stream integration completed five gliding calls, won at S rank, and stopped the microphone track. Actual phone voice feel, Safari recovery policy, LINE behavior, and device performance still require the real-device gate in PLAN.md.
+
+
+Approved design update (2026-10-04): the isolated preview was approved and its
+pastel garden, raised scene, rounded bushes/flowers, reaction bubbles, pixel
+controls, and rank badge applied to the actual game. The meter uses calibrated
+thresholds rather than the prototype's static color bands; text/step rewards
+and rank letters come from live gameplay. Walking/travel share CONFIG.walkingMs
+(400ms), and victory rests using idle/blink frames. Game rules, scoring, audio
+thresholds, and input/lifecycle fixes remain intact. Two focused regressions
+cover meter threshold alignment and event/win feedback. The approved prototype
+and regenerable native art are retained in pixel-art/design-preview.

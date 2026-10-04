@@ -13,7 +13,7 @@ function setup() {
     const classes = new Set();
     return {
       offsetWidth: 130, textContent: '', hidden: false, disabled: false, lang: '',
-      style: { display: ['scene', 'errorScreen', 'endScreen'].includes(id) ? 'none' : 'flex', setProperty() {}, removeProperty() {} },
+      style: { display: ['scene', 'errorScreen', 'endScreen'].includes(id) ? 'none' : 'flex', setProperty(name,value) { this[name]=value; }, removeProperty(name) { delete this[name]; } },
       classList: { add: (...items) => items.forEach(x => classes.add(x)), remove: (...items) => items.forEach(x => classes.delete(x)), contains: x => classes.has(x) },
       addEventListener(type, handler) { this[type] = handler; },
       querySelector: () => element(), querySelectorAll: () => [],
@@ -98,7 +98,7 @@ const tests = [
     const a=audio(h); await start(h); let at=2200;
     for(let i=0;i<5;i++,at+=1200) meow(h,at,900,true);
     assert.equal(h.run('gameState'),'won'); assert.ok(a.tracks[0].stopped); h.timers(at+1000);
-    assert.equal(h.elements.get('endTitle').textContent,'You win! Rank S'); assert.equal(h.elements.get('endMsg').lang,'th');
+    assert.equal(h.elements.get('endTitle').textContent,'You made a friend.'); assert.equal(h.elements.get('rankBadge').textContent,'S'); assert.equal(h.elements.get('endMsg').lang,'th');
     assert.ok(h.storage.has('meowme_best_time')); h.run('totalQuality=0;showEndScreen("won",6)');
     assert.equal(h.elements.get('endMsg').lang,'en'); assert.ok(!h.elements.get('rankTip').hidden);
     assert.equal(h.run('rankForScore(CONFIG.rankA)'),'A'); assert.equal(h.run('rankForScore(CONFIG.rankB)'),'B');
@@ -169,6 +169,18 @@ const tests = [
     const a=audio(h);await start(h);h.time(3100);a.contexts[0].state='suspended';a.contexts[0].statechange();
     assert.equal(h.elements.get('resumeBtn').hidden,false);h.time(7100);h.run('gameTick(performance.now())');
     await h.elements.get('resumeBtn').click();assert.equal(h.run('pauseStartedAt'),0);assert.equal(h.run('roundStartAt'),6100);assert.equal(h.run('catPos'),50);
+  }],
+  ['meter marker and labels agree with calibrated volume thresholds', h => {
+    h.run('startGame();minVol=.0015;scareVol=.004;renderScene(minVol)');
+    assert.ok(Math.abs(parseFloat(h.elements.get('micMeterBar').style.left)-parseFloat(h.elements.get('hud').style['--quiet-end']))<.001);
+    h.run('renderScene(scareVol)');
+    assert.ok(Math.abs(parseFloat(h.elements.get('micMeterBar').style.left)-parseFloat(h.elements.get('hud').style['--scare-start']))<.001);
+    h.run('renderScene(1)'); assert.equal(h.elements.get('micMeterBar').style.left,'100%');
+  }],
+  ['reaction text follows accepted events and preserves win feedback', h => {
+    h.run('startGame()');meow(h,1000,900,true);assert.equal(h.elements.get('gameStatus').textContent,'Nice meow! +12');
+    h.run('catPos=96');meow(h,2300,900,true);assert.equal(h.elements.get('gameStatus').textContent,'Home sweet home.');
+    assert.equal(h.elements.get('gameStatus').hidden,false);
   }],
   ['calibration interrupted by backgrounding recovers', async h => {
     audio(h);const pending=h.run('startAudio()');await flush();h.context.document.hidden=true;h.events.visibilitychange();await pending;

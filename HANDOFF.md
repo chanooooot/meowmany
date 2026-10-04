@@ -1,5 +1,10 @@
 # Current update
 
+Approved pixel-garden preview applied: softer sky/grass, rounded bushes,
+flowers, a raised playfield, reaction bubbles, calibrated meter bands, crisp
+pixel controls, resting win pose, and rank badges. Source art and the approved
+prototype are preserved in pixel-art/design-preview.
+
 Gameplay/lifecycle fixes now supersede the historical implementation details below.
 Read AGENTS.md, SPEC.md, PLAN.md, and STATUS.md for current behavior and verification.
 SFX remain deliberately absent; the shipped game remains one HTML file.

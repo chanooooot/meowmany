@@ -12,7 +12,9 @@ Everything shipped is in `index.html`: CSS, embedded pixel sprites, markup,
 and vanilla JavaScript. No build, runtime dependencies, external assets,
 backend, uploads, analytics, sound effects, settings, levels, leaderboard,
 PWA, or share API. Audio is processed locally. LocalStorage stores best time.
-Source sprite tooling lives in `tools/pixel-art/world/build.py`.
+Source sprite tooling lives in `tools/pixel-art/world/build.py` and
+`pixel-art/design-preview/build.py`. The latter directory also preserves the
+approved visual prototype and native bush/flower/heart artwork.
 
 `SPEC.md` describes current behavior. `PLAN.md` describes current verification
 requirements. `CLAUDE.md` has binding implementation constraints. `HANDOFF.md`
@@ -27,8 +29,11 @@ commit/push authorizes that deployment; do not ask again.
 ## Implementation map
 
 - CSS `:root` owns colors and embedded image data. Cat rows: idle, walking,
-  scared; happy reuses walking frames with a bounce. World art stays visible
-  across screens. Results use a cream card with dark text and a rank accent.
+  scared; happy rests using idle/blink frames. Walking and travel share a
+  400ms duration; scare uses a stable frame from its dedicated row. The
+  approved pastel garden has rounded bushes, flowers, and pixel hearts.
+  World art stays visible across screens. Results use a cream card with dark
+  text, a rank badge, and crisp borders/shadows.
 - `CONFIG` owns tunable gameplay values. **Keep the phone-tuned volume floors
   and disabled auto gain control.** Desktop measurements cannot retune phones.
 - Audio: `startAudio`, `calibrate`, `rms`, `detectPitch`, `classify`.
@@ -45,7 +50,10 @@ commit/push authorizes that deployment; do not ask again.
   pause; context recovery may require the visible tap-to-resume button.
 - Rendering: `positionCat` maps progress from fully offscreen to the bed while
   accounting for sprite width; resize updates bounds. `renderScene` updates
-  the meter and a non-announcing, inspectable timer.
+  the calibrated quiet/gentle/loud meter and a non-announcing, inspectable timer.
+  Reaction bubbles follow the cat, clamp inside the viewport during travel,
+  and keep the existing live status announcements. Short screens simplify
+  decorative headings and result tips to preserve controls.
 - Results: `showEndScreen` mixes average duration/glide quality with time.
   Rank criteria and drift/scare loss reasons are explained to the player.
   Rank title language follows the selected Thai/English text.
