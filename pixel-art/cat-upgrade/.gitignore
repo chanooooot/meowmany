@@ -1,3 +1,9 @@
 # Transient sprite-gen publication locks.
 .*.sg-rwlock
 .sprite-gen.lock
+
+# Regenerable sprite-gen intermediates: sprite-gen extract rebuilds them from
+# run/raw/*.png (kept). *.raw.png are byte-identical copies of those originals.
+run/raw/*.raw.png
+run/frames/*/orig/
+run/frames/*/*.plain.png

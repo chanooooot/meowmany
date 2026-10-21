@@ -6,7 +6,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const source = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8').match(/<script>([\s\S]*?)<\/script>/)[1];
 
-function setup() {
+function setup(overrides = {}) {
   let now = 1000, sequence = 0;
   const elements = new Map(), events = {}, frames = new Map(), timers = new Map(), storage = new Map();
   function element(id) {
@@ -22,7 +22,7 @@ function setup() {
     };
   }
   const context = {
-    console, Float32Array, URLSearchParams, location: { search: '' },
+    console, Float32Array, URL, URLSearchParams, location: { search: '' },
     performance: { now: () => now },
     document: { hidden: false, getElementById(id) { if (!elements.has(id)) elements.set(id, element(id)); return elements.get(id); }, addEventListener: (type, handler) => events[type] = handler, createElement: () => element() },
     window: { innerWidth: 390, addEventListener: (type, handler) => events[type] = handler },
@@ -31,7 +31,8 @@ function setup() {
     requestAnimationFrame: handler => { frames.set(++sequence, handler); return sequence; },
     cancelAnimationFrame: id => frames.delete(id),
     setTimeout: (handler, delay) => { timers.set(++sequence, { handler, at: now + delay }); return sequence; },
-    clearTimeout: id => timers.delete(id), matchMedia: () => ({ matches: false })
+    clearTimeout: id => timers.delete(id), matchMedia: () => ({ matches: false }),
+    ...overrides
   };
   vm.createContext(context);
   vm.runInContext(source, context);
@@ -79,12 +80,19 @@ const tests = [
   }],
   ['loudness chatter is one scare and sustained quiet rearms', h => {
     h.run('startGame(); minVol=.0015; scareVol=.004');
-    for (const [i,v] of [.0041,.0039,.0041,.0039,.0041,.0039,.0041].entries()) h.run(`updateScream(${v},${1000+i*16})`);
-    assert.equal(h.run('catPos'),35); h.run('updateScream(.002,1300);updateScream(.002,1600);updateScream(.005,1700)');
+    for (const [i,v] of [.0041,.0039,.0041,.0039,.0041,.0039,.0041,.0039,.0041,.0039,.0041].entries()) h.run(`updateScream(${v},${1000+i*16})`);
+    assert.equal(h.run('catPos'),35); h.run('updateScream(.002,1300);updateScream(.002,1600);updateScream(.005,1700);updateScream(.005,1820)');
     assert.equal(h.run('catPos'),20);
   }],
+  ['brief loud spike neither scares nor splits a meow', h => {
+    h.run('startGame(); minVol=.0015; scareVol=.004; updateMeowTracking("meow",300,1000);updateScream(.005,1300);updateMeowTracking("scream",-1,1300);updateScream(.005,1340);updateMeowTracking("scream",-1,1340)');
+    assert.equal(h.run('meowActive && meowStartTime'),1000);
+    h.run('updateScream(.002,1360);updateMeowTracking("meow",300,1360);updateScream(.002,1600);updateMeowTracking("meow",300,1900);updateMeowTracking("silence",-1,1950);updateMeowTracking("silence",-1,2050)');
+    assert.equal(h.run('catPos'),58); assert.equal(h.run('meowCountForScore'),1); assert.equal(h.run('screamLoudAt'),null);
+  }],
   ['scream-ending candidate never earns reward or wins', h => {
-    h.run('startGame(); minVol=.0015; scareVol=.004; catPos=96; updateMeowTracking("meow",300,1000);updateMeowTracking("meow",310,1400);updateScream(.005,1500);updateMeowTracking("scream",300,1500)');
+    h.run('startGame(); minVol=.0015; scareVol=.004; catPos=96; updateMeowTracking("meow",300,1000);updateMeowTracking("meow",310,1400);updateScream(.005,1500);updateMeowTracking("scream",300,1500);updateScream(.005,1620);updateMeowTracking("scream",300,1620)');
+    h.run('updateMeowTracking("silence",-1,1700);updateMeowTracking("silence",-1,1800)');
     assert.equal(h.run('catPos'),81); assert.equal(h.run('meowCountForScore'),0); assert.equal(h.run('gameState'),'playing');
   }],
   ['frame loop enforces deadline before finishing candidate', h => {
@@ -139,7 +147,19 @@ const tests = [
   }],
   ['scream frames skip pitch computation', h => {
     h.run('startGame();minVol=.0015;scareVol=.004;audioCtx={state:"running",sampleRate:48000};timeData=new Float32Array(2048);analyser={getFloatTimeDomainData:b=>b.fill(.005)};detectPitch=()=>{throw Error("Unexpected pitch work")};frameLoop()');
-    assert.equal(h.run('catPos'),35);
+    h.time(1120); h.run('frameLoop()'); assert.equal(h.run('catPos'),35);
+  }],
+  ['calibration ignores a brief word', h => {
+    h.run('calls=0;analyser={getFloatTimeDomainData:b=>b.fill(++calls===3?.05:.002)};timeData=new Float32Array(2048);calibrate()');
+    for (let t=1100;t<=2100;t+=100) h.tick(t);
+    assert.ok(Math.abs(h.run('minVol')-.003)<1e-9); assert.ok(Math.abs(h.run('scareVol')-.007)<1e-9);
+  }],
+  ['LINE in-app browser redirects once to the system browser', () => {
+    const replaced=[], href='https://chanooooot.github.io/meowmany/', navigator={userAgent:'Mozilla/5.0 (iPhone) Safari Line/14.0.0'};
+    setup({navigator,location:{search:'',href,replace:url=>replaced.push(url)}});
+    assert.deepEqual(replaced,[href+'?openExternalBrowser=1']);
+    setup({navigator,location:{search:'?openExternalBrowser=1',href:href+'?openExternalBrowser=1',replace:url=>replaced.push(url)}});
+    assert.equal(replaced.length,1);
   }],
   ['pending retry remains visible and late permission is cleaned up', async h => {
     let resolve;const a=audio(h,{getUserMedia:()=>new Promise(r=>resolve=r)});

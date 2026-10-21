@@ -1,8 +1,8 @@
 # PLAN.md — Current verification gates
 
-The original build and visual redesign are complete. SFX were deliberately
-removed; do not restore them. Current work repairs the gameplay/lifecycle
-review documented in REVIEW.md. Follow these gates for future changes.
+The original build, visual redesign, and 2026-10-04 gameplay/lifecycle review
+are complete (`git show 58c41fe:REVIEW.md`). SFX were deliberately removed; do
+not restore them. Follow these gates for future changes.
 
 1. Trace the actual input/round path before changing it. Put tunables in CONFIG.
 2. Run `node tools/test-game.cjs`; add a targeted regression for new logic bugs.
@@ -13,10 +13,12 @@ review documented in REVIEW.md. Follow these gates for future changes.
    text, reduced motion, and inspectable timing/status.
 4. Test actual voices on iPhone Safari and Android Chrome over HTTPS. Confirm
    gentle/low/high meows, glides, brief pitch gaps, distinct and sustained loud
-   calls, calibration, drift, timeout, win/loss, and repeated retry.
+   calls, screen taps (must not scare), calibration, drift, timeout, win/loss,
+   and repeated retry. Record `?debug=1` readings in SPEC.md's tuning log.
 5. Test lifecycle: cancel pending permission/calibration, retry, background/return,
    suspended context and tap-to-resume, input-device loss, rejected setup,
-   mic indicator shutoff, denied permission, LINE fallback, and clipboard failure.
+   mic indicator shutoff, denied permission, LINE redirect and fallback, and
+   clipboard failure.
 6. Commit and push when authorized. Verify the remote commit and deployment.
    Do not claim device verification from headless Chrome or mocked audio.
 

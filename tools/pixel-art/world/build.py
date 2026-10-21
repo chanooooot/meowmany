@@ -1,5 +1,8 @@
+import os
 import sys
-sys.path.insert(0, "/Users/chanoot/.claude/skills/pixel-art-studio/scripts")
+from pathlib import Path
+# Set PIXEL_ART_STUDIO if the skill lives elsewhere on this machine.
+sys.path.insert(0, os.environ.get("PIXEL_ART_STUDIO", str(Path.home() / ".claude/skills/pixel-art-studio/scripts")))
 from pixelstudio import Sprite
 from PIL import Image
 
@@ -18,7 +21,7 @@ BED_RIM = "#e0623b"    # var(--marigold-deep)
 BED_FILL = "#ff8a65"   # var(--marigold)
 BED_TOP = "#fffaf3"    # var(--cream)
 
-OUT = "/Users/chanoot/Desktop/Claude Project/Meowmany/meowmany/tools/pixel-art/world"
+OUT = os.path.dirname(os.path.abspath(__file__))
 
 
 def build_sun():

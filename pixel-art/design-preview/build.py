@@ -1,6 +1,8 @@
 from pathlib import Path
+import os
 import sys
-sys.path.insert(0, '/Users/chanoot/.agents/skills/pixel-art-studio/scripts')
+# Set PIXEL_ART_STUDIO if the skill lives elsewhere on this machine.
+sys.path.insert(0, os.environ.get('PIXEL_ART_STUDIO', str(Path.home() / '.claude/skills/pixel-art-studio/scripts')))
 from pixelstudio import Sprite
 
 OUT = Path(__file__).parent
