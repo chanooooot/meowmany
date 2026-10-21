@@ -4,16 +4,33 @@ Session log, newest first. Current behavior lives in SPEC.md, constraints in
 CLAUDE.md and AGENTS.md, open work in STATUS.md. Device behavior is unverified
 unless an entry says a real phone was used.
 
+## What's left (2026-10-21)
+
+Next, on real phones (iPhone Safari, Android Chrome), live URL with `?debug=1`:
+1. Fill SPEC.md's phone tuning log: quiet room, gentle meow, shout, screen tap.
+   Judge taps by the "Too loud!" bubble or catPos, not the debug label.
+2. Retune scareVolMultiplier / scareVolFloor only from those numbers.
+3. Play win, loss, retry; background and return; tap-to-resume; mic loss.
+4. Open the link inside LINE: should jump to the system browser, no reload loop.
+
+Open decisions (product, yours):
+- Speech syllables now count as meows (100–900Hz, 0.15s min). Keep?
+- Skilled wins take about 6s of a 60s round. Too short?
+- Thai joke for the loss screen (currently English title only).
+
+Deferred until phone data exists:
+- Pitch-detection cost (profile on a 120Hz Android first).
+
 ## Log
 
-## 2026-10-21 Copy pass (this entry's commit)
+## 2026-10-21 Copy pass (0eb872e)
 Did: one instruction phrase reused verbatim; removed silence nag, play heading, duplicate Thai loss line; rank joke is win headline; "Nice slide! +12"; clearer errors; short-screen sun moved off text.
 Root cause (if fix): silence hint replaced the opening instruction after ~1s and scolded the pause after each meow.
 Verified: 28/28 regression checks; headless Chrome landing/play/win/loss at 390x844, 375x548, 320x568, 780x400.
 NOT verified: real phones.
 Next: fill SPEC.md phone tuning log on iPhone Safari and Android Chrome.
 
-## 2026-10-21 Review fixes (this entry's commit)
+## 2026-10-21 Review fixes (d40142b)
 Did: 120ms scare hold; median calibration; LINE redirect via `?openExternalBrowser=1`; description/og meta and favicon; 64-color idle/walk rows (page 300KB → 97KB); portable build scripts; derived sprite-gen files untracked; dead CSS removed; REVIEW.md retired to git history; SPEC.md phone tuning log added.
 Root cause (if fix): one loud frame (tap, bump, plosive) counted as a scream; calibration mean jumped on any stray sound.
 Verified: `node tools/test-game.cjs` 27/27, new checks fail on the old behavior; headless Chrome landing/win at 390x844 and 780x400; build scripts rerun from another folder give identical PNGs.
