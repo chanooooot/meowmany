@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Meow Many 🐱</title>
-<meta name="description" content="Meow gently into your mic to bring a tiny pixel cat to its bed. Too loud and it runs. No pressure, ทาสแมว.">
+<meta name="description" content="Meow to call a pixel cat to its bed. Loud noises scare it. No pressure, ทาสแมว.">
 <meta property="og:title" content="Meow Many 🐱">
-<meta property="og:description" content="Meow gently into your mic to bring a tiny pixel cat to its bed. Too loud and it runs. No pressure, ทาสแมว.">
+<meta property="og:description" content="Meow to call a pixel cat to its bed. Loud noises scare it. No pressure, ทาสแมว.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
 <style>
   :root{
@@ -42,9 +42,8 @@
     padding:24px;box-sizing:border-box;}
   #errorScreen,#endScreen{display:none;}
   #landing h1{font-size:clamp(2rem,10vw,2.8rem);margin:0;letter-spacing:-.04em;text-wrap:balance;font-weight:800;color:var(--ink);}
-  #landing p{max-width:26ch;margin:0;line-height:1.6;color:var(--ink);font-size:15px;}
+  #landing p{max-width:36ch;text-wrap:balance;margin:0;line-height:1.6;color:var(--ink);font-size:15px;}
   #endTitle{font-size:clamp(1.5rem,7vw,2rem);margin:0;letter-spacing:-.04em;color:var(--ink);}
-  #endMsg{color:var(--ink);}
   #errorTitle{margin:0;color:var(--ink);}
   #errorMsg{max-width:34ch;line-height:1.5;color:var(--ink);}
 
@@ -96,16 +95,13 @@
   .flower{position:absolute;width:32px;height:32px;background-image:var(--flower-sprite);background-size:32px 32px;image-rendering:pixelated;bottom:15%;}
   .flower.a{left:12%;}.flower.b{left:63%;bottom:10%;}.flower.c{right:11%;bottom:31%;}
   #meterGuide{display:grid;grid-template-columns:var(--quiet-end,29%) calc(var(--scare-start,77%) - var(--quiet-end,29%)) calc(100% - var(--scare-start,77%));text-align:center;font-size:11px;font-weight:650;}
-  #playTitleWrap{position:absolute;top:24%;left:0;right:0;text-align:center;padding:0 32px;}
-  #playTitle{font-size:clamp(1.7rem,8vw,2rem);margin:0 0 8px;letter-spacing:-.04em;}
-  #playTitleWrap p{margin:0;font-size:14px;line-height:1.5;}
   #gameStatus::after{content:"";position:absolute;bottom:-9px;left:var(--tail-left,38px);width:12px;height:12px;background:var(--cream);border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(45deg);}
   #rankBadge{width:56px;height:48px;border:2px solid var(--ink);background:var(--rank-color,var(--marigold));box-shadow:3px 3px 0 var(--ink);display:grid;place-items:center;font:bold 30px ui-monospace,monospace;}
   #endScreen{justify-content:flex-start;padding-top:max(30px,env(safe-area-inset-top));}
   #endCard p{font-size:14px;line-height:1.5;}
   #endCard #shareHint{font-size:12px;}
   @media(max-height:440px){#endScreen{padding:max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));}#endCard{padding:16px;gap:8px;}#endTitle{font-size:1.5rem;}#rankBadge{width:40px;height:34px;font-size:24px;}#endCard p{font-size:13px;line-height:1.35;}#rankTip{display:none;}}
-  @media(max-height:600px){#playTitleWrap{display:none;}#catWrap,#bed{bottom:max(14px,env(safe-area-inset-bottom));}#groundPath{bottom:calc(max(14px,env(safe-area-inset-bottom)) + 24px);}#landing{padding-top:24px;gap:12px;}#landing h1{font-size:2rem;}#endScreen{justify-content:center;padding-top:max(12px,env(safe-area-inset-top));}.flower{display:none;}}
+  @media(max-height:600px){#catWrap,#bed{bottom:max(14px,env(safe-area-inset-bottom));}#groundPath{bottom:calc(max(14px,env(safe-area-inset-bottom)) + 24px);}#landing{padding-top:24px;gap:12px;}#landing h1{font-size:2rem;}#endScreen{justify-content:center;padding-top:max(12px,env(safe-area-inset-top));}.flower{display:none;}#sun{top:4%;}}
 </style>
 </head>
 <body>
@@ -121,13 +117,13 @@
   <div id="bed" aria-hidden="true"></div>
   <div id="catWrap">
     <div id="cat" role="img" aria-label="cat"></div>
-    <p id="gameStatus" role="status" aria-live="polite" hidden>Waiting to listen...</p>
+    <p id="gameStatus" role="status" aria-live="polite" hidden></p>
   </div>
 </div>
 
 <main id="landing">
   <h1 tabindex="-1">Meow Many</h1>
-  <p>A tiny cat. A cozy bed.<br>Meow gently for a second, then pause.<br>No pressure, <span lang="th">ทาสแมว</span>.</p>
+  <p>Meow to call the cat to its bed.<br>Loud noises scare it.<br>Meow for about a second, then pause.<br>No pressure, <span lang="th">ทาสแมว</span>.</p>
   <button id="startBtn">Start meowing</button>
 </main>
 
@@ -150,7 +146,6 @@
 </div>
 
 <section id="scene" aria-label="Meow Many game">
-  <div id="playTitleWrap"><h2 id="playTitle">A little closer.</h2><p>Meow gently, then let the cat listen.</p></div>
   <div id="hud">
     <div id="micMeterWrap" aria-hidden="true"><div id="micMeterBar"></div></div>
     <div id="hudRow">
@@ -167,10 +162,9 @@
   <div id="endCard">
   <div id="rankBadge" role="img" aria-label="Rank" hidden></div>
   <h2 id="endTitle" tabindex="-1"></h2>
-  <p id="endMsg"></p>
   <p id="newBest" hidden>New best!</p>
   <p id="endStats"></p>
-  <p id="rankTip" hidden>Smooth one-second meows and a quick finish earn better ranks.</p>
+  <p id="rankTip" hidden>Better rank: one-second meows, a pitch slide (mee-OW), and a fast finish.</p>
   <p id="shareHint" hidden>Screenshot this and challenge a friend.</p>
   <button id="endRetryBtn">Play again</button>
   </div>
@@ -241,7 +235,6 @@ const micMeterBar = document.getElementById('micMeterBar');
 const timeLeftDisplay = document.getElementById('timeLeftDisplay');
 const endScreen = document.getElementById('endScreen');
 const endTitle = document.getElementById('endTitle');
-const endMsg = document.getElementById('endMsg');
 const endStats = document.getElementById('endStats');
 const endRetryBtn = document.getElementById('endRetryBtn');
 const gameStatus = document.getElementById('gameStatus');
@@ -253,7 +246,6 @@ const rankTip = document.getElementById('rankTip');
 const bed = document.getElementById('bed');
 const hud = document.getElementById('hud');
 const rankBadge = document.getElementById('rankBadge');
-const playTitle = document.getElementById('playTitle');
 const BEST_TIME_KEY = 'meowme_best_time';
 
 if (DEBUG) debugPanel.classList.add('on');
@@ -269,8 +261,6 @@ function focusSoon(el) { setTimeout(() => el.focus(), 0); }
 function setGameStatus(text) {
   if (gameStatus.textContent !== text) gameStatus.textContent = text;
   gameStatus.hidden = !['starting', 'calibrating', 'playing', 'won'].includes(gameState);
-  const title = gameState === 'playing' && screamLatched ? 'A softer hello.' : 'A little closer.';
-  if (playTitle.textContent !== title) playTitle.textContent = title;
 }
 function stopAudio() {
   audioSession++;
@@ -325,7 +315,7 @@ async function startAudio() {
   catWrap.classList.remove('happy');
   catWrap.querySelectorAll('.heart').forEach(h => h.remove());
   catPos = CONFIG.catStartPos; renderScene(0);
-  setGameStatus('Starting mic... Allow access, or choose Start over.');
+  setGameStatus('Allow mic access to play.');
   focusSoon(restartBtn);
   startBtn.disabled = true; startBtn.textContent = 'Starting...';
   try {
@@ -350,7 +340,7 @@ async function startAudio() {
     timeData = new Float32Array(analyser.fftSize); source.connect(analyser);
     ctx.addEventListener('statechange', () => {
       if (session !== audioSession) return;
-      if (ctx.state === 'closed') { showError('Mic stopped', 'Your audio session ended. Try again.'); return; }
+      if (ctx.state === 'closed') { showError('Mic stopped', 'The mic stopped. Try again.'); return; }
       if (gameState === 'calibrating' && ctx.state !== 'running') {
         showError('Listening interrupted', 'Keep this page open and try again.'); return;
       }
@@ -359,7 +349,7 @@ async function startAudio() {
       else resumeGame();
     });
     gameState = 'calibrating';
-    setGameStatus('Stay quiet for a moment. Listening to the room...');
+    setGameStatus('Stay quiet for a second. Checking room noise.');
     await calibrate();
     if (session !== audioSession) return;
     if (ctx.state !== 'running' || document.hidden) {
@@ -372,7 +362,7 @@ async function startAudio() {
     if (err.name === 'NotAllowedError' || err.name === 'SecurityError')
       showError('Mic access denied', 'Allow microphone access in your browser settings, then try again. In LINE, open this link in Chrome or Safari.', true);
     else if (err.name === 'NotFoundError') showError('No microphone found', 'Connect a microphone and try again.');
-    else if (err.name === 'NotReadableError') showError('Mic unavailable', 'Another app or device problem may be using your mic. Check it and try again.');
+    else if (err.name === 'NotReadableError') showError('Mic unavailable', 'Another app may be using your mic. Close it and try again.');
     else showError('Mic trouble', 'The microphone could not start. Check your device and try again.');
   } finally {
     if (session === audioSession) {
@@ -403,17 +393,17 @@ function startGame() {
   landing.style.display = 'none'; errorScreen.style.display = 'none';
   endScreen.style.display = 'none'; scene.style.display = 'block';
   gameState = 'playing';
-  setGameStatus('Gentle meow for about a second, then pause.');
+  setGameStatus('Meow for about a second, then pause.');
 }
 function endRound(result) {
   if (gameState !== 'playing') return;
   gameState = result;
   if (result === 'won') {
     finalCompletionTime = (performance.now() - roundStartAt) / 1000;
-    stopAudio(); spawnHearts(); setGameStatus('Home sweet home.'); positionCat();
+    stopAudio(); spawnHearts(); setGameStatus('Zzz'); positionCat();
     endRevealTimeout = setTimeout(() => showEndScreen('won', finalCompletionTime), matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : CONFIG.winRevealMs);
   } else {
-    lastLossMessage = (performance.now() - roundStartAt) / 1000 >= CONFIG.roundSec ? "Time's up. Try smooth one-second meows, then pause." : lastRetreat === 'scream' ? 'Too loud! Gentle calls keep the cat close.' : 'The cat wandered off. Accepted meows keep it close.';
+    lastLossMessage = (performance.now() - roundStartAt) / 1000 >= CONFIG.roundSec ? "Time's up. Meow for about a second, then pause." : lastRetreat === 'scream' ? 'Too loud. Yelling scares the cat away.' : 'The cat wandered off. Meow more often to keep it close.';
     stopAudio(); showEndScreen('lost');
   }
 }
@@ -431,23 +421,21 @@ function showEndScreen(result, completionTimeSec) {
     const avgQuality = meowCountForScore ? totalQuality / meowCountForScore : 0;
     const timeBonus = Math.max(0, Math.min(1, 1 - completionTimeSec / CONFIG.roundSec));
     const rank = rankForScore(avgQuality * CONFIG.scoreQualityWeight + timeBonus * CONFIG.scoreTimeWeight);
-    const titles = { S: 'ทาสแมวตัวจริง 🏆', A: 'Certified Cat Whisperer', B: 'The cat tolerates you', C: 'แมวมาเพราะสงสาร 😹' };
+    const titles = { S: 'ทาสแมวตัวจริง 🏆', A: 'The cat approves', B: 'The cat tolerates you', C: 'แมวมาเพราะสงสาร 😹' };
     const prevBest = readBestTime(), isNewBest = isNaN(prevBest) || completionTimeSec < prevBest, bestTime = isNewBest ? completionTimeSec : prevBest;
     if (isNewBest) saveBestTime(completionTimeSec);
     endScreen.style.setProperty('--rank-color', `var(--rank-${rank})`);
-    endTitle.textContent = 'You made a friend.';
+    endTitle.textContent = titles[rank]; endTitle.lang = rank === 'S' || rank === 'C' ? 'th' : 'en';
     rankBadge.textContent = rank; rankBadge.setAttribute('aria-label', `Rank ${rank}`); rankBadge.hidden = false;
-    setGameStatus('Home sweet home.');
-    endMsg.lang = rank === 'S' || rank === 'C' ? 'th' : 'en';
+    setGameStatus('Zzz');
     rankTip.hidden = false;
-    endMsg.textContent = titles[rank]; newBest.hidden = !isNewBest; shareHint.hidden = false;
+    newBest.hidden = !isNewBest; shareHint.hidden = false;
     endStats.textContent = `Time: ${completionTimeSec.toFixed(1)}s - Best: ${bestTime.toFixed(1)}s`;
   } else {
-    endScreen.style.removeProperty('--rank-color'); endTitle.textContent = 'The cat ignored you';
+    endScreen.style.removeProperty('--rank-color'); endTitle.textContent = 'The cat ignored you'; endTitle.lang = 'en';
     rankBadge.hidden = true; gameStatus.hidden = true;
-    endMsg.lang = 'th';
     rankTip.hidden = true;
-    endMsg.textContent = 'แมวไม่สนใจคุณ'; newBest.hidden = true; shareHint.hidden = true; endStats.textContent = lastLossMessage;
+    newBest.hidden = true; shareHint.hidden = true; endStats.textContent = lastLossMessage;
   }
   positionCat();
   focusSoon(endTitle);
@@ -554,7 +542,7 @@ function gameTick(now) {
     const dt = Math.max(0, now - Math.max(previousTick, driftStartsAt)) / 1000;
     catPos = Math.max(0, catPos - CONFIG.driftSpeed * dt);
     lastRetreat = 'drift';
-    if (now >= feedbackUntil && !meowActive && !screamLatched) setGameStatus('The cat is wandering... Call it back!');
+    if (now >= feedbackUntil && !meowActive && !screamLatched) setGameStatus('The cat is wandering off. Meow to bring it back.');
     checkWinLose();
   }
 }
@@ -673,7 +661,7 @@ function updateMeowTracking(label, pitch, now) {
     meowGapAt = null;
     if (!meowActive) {
       meowActive = true; meowStartTime = now; meowPitches = [];
-      if (now >= feedbackUntil) setGameStatus('Hearing your meow... Pause when you finish.');
+      if (now >= feedbackUntil) setGameStatus("Listening. Pause when you're done.");
     }
     if (pitch > 0) meowPitches.push(pitch);
     return;
@@ -686,7 +674,7 @@ function updateMeowTracking(label, pitch, now) {
   meowGapAt = null;
   if (durationSec < CONFIG.meowMinSec) { feedback('Try a longer meow, about a second.', now); return; }
   if (durationSec > CONFIG.meowMaxSec) { feedback('Try a shorter meow, about a second.', now); return; }
-  if ((now - lastCountedMeowAt) / 1000 < CONFIG.cooldownSec) { feedback('Pause a little longer between calls.', now); return; }
+  if ((now - lastCountedMeowAt) / 1000 < CONFIG.cooldownSec) { feedback('Wait a moment between meows.', now); return; }
 
   const n = meowPitches.length;
   const glideHz = n >= 2 ? meowPitches[n - 1] - meowPitches[0] : 0;
@@ -701,7 +689,7 @@ function updateMeowTracking(label, pitch, now) {
   onMeowEvent(evt);
   applyGoodMeow(evt);
   if (gameState === 'playing') {
-    feedback(glide ? `Nice meow! +${CONFIG.stepGood + CONFIG.stepGlideBonus}` : `Nice meow! +${CONFIG.stepGood}`, now);
+    feedback(glide ? `Nice slide! +${CONFIG.stepGood + CONFIG.stepGlideBonus}` : `Nice meow! +${CONFIG.stepGood}`, now);
     spawnMeowHeart();
   }
 }
@@ -747,9 +735,7 @@ function frameLoop() {
       if (!meowActive && !screamLatched && now >= feedbackUntil && now - labelSince >= CONFIG.inputHintMs) {
         if (label === 'talk') setGameStatus(pitch > 0
           ? pitch < CONFIG.pitchMinHz ? 'Try a slightly higher meow.' : 'Try a slightly lower meow.'
-          : 'Try a smooth voiced meow, then pause.');
-        else if (label === 'silence' && now - lastGoodMeowAt < CONFIG.driftAfterSec * 1000)
-          setGameStatus('Mic quiet. Try a gentle meow a little closer.');
+          : "Use your voice. Whispers and hisses don't count.");
       }
       lastRawLabel = label;
     }
@@ -795,7 +781,7 @@ function resumeGame() {
     roundStartAt += pausedFor; lastGoodMeowAt += pausedFor; lastCountedMeowAt += pausedFor;
     lastTickAt = now; feedbackUntil = now; labelSince = now;
     screamQuietAt = null; screamLoudAt = null;
-    pauseStartedAt = 0; setGameStatus('Welcome back. Gentle meow, then pause.');
+    pauseStartedAt = 0; setGameStatus('Meow for about a second, then pause.');
   }
   resumeBtn.hidden = true;
 }

@@ -106,9 +106,9 @@ const tests = [
     const a=audio(h); await start(h); let at=2200;
     for(let i=0;i<5;i++,at+=1200) meow(h,at,900,true);
     assert.equal(h.run('gameState'),'won'); assert.ok(a.tracks[0].stopped); h.timers(at+1000);
-    assert.equal(h.elements.get('endTitle').textContent,'You made a friend.'); assert.equal(h.elements.get('rankBadge').textContent,'S'); assert.equal(h.elements.get('endMsg').lang,'th');
+    assert.equal(h.elements.get('endTitle').textContent,'ทาสแมวตัวจริง 🏆'); assert.equal(h.elements.get('rankBadge').textContent,'S'); assert.equal(h.elements.get('endTitle').lang,'th');
     assert.ok(h.storage.has('meowme_best_time')); h.run('totalQuality=0;showEndScreen("won",6)');
-    assert.equal(h.elements.get('endMsg').lang,'en'); assert.ok(!h.elements.get('rankTip').hidden);
+    assert.equal(h.elements.get('endTitle').lang,'en'); assert.ok(!h.elements.get('rankTip').hidden);
     assert.equal(h.run('rankForScore(CONFIG.rankA)'),'A'); assert.equal(h.run('rankForScore(CONFIG.rankB)'),'B');
     h.storage.set('meowme_best_time','Infinity'); assert.ok(Number.isNaN(h.run('readBestTime()')));
   }],
@@ -164,7 +164,7 @@ const tests = [
   ['pending retry remains visible and late permission is cleaned up', async h => {
     let resolve;const a=audio(h,{getUserMedia:()=>new Promise(r=>resolve=r)});
     h.run('startGame();endRound("lost")'); const pending=h.run('startAudio()');await flush();
-    assert.equal(h.elements.get('scene').style.display,'block');assert.match(h.elements.get('gameStatus').textContent,/Starting/);
+    assert.equal(h.elements.get('scene').style.display,'block');assert.match(h.elements.get('gameStatus').textContent,/Allow mic access/);
     h.elements.get('restartBtn').click();resolve(a.stream);await pending;
     assert.ok(a.tracks[0].stopped);assert.equal(h.run('gameState'),'landing');assert.equal(h.run('isStarting'),false);
   }],
@@ -204,9 +204,16 @@ const tests = [
     h.run('renderScene(1)'); assert.equal(h.elements.get('micMeterBar').style.left,'100%');
   }],
   ['reaction text follows accepted events and preserves win feedback', h => {
-    h.run('startGame()');meow(h,1000,900,true);assert.equal(h.elements.get('gameStatus').textContent,'Nice meow! +12');
-    h.run('catPos=96');meow(h,2300,900,true);assert.equal(h.elements.get('gameStatus').textContent,'Home sweet home.');
+    h.run('startGame()');meow(h,1000,900,true);assert.equal(h.elements.get('gameStatus').textContent,'Nice slide! +12');
+    h.run('catPos=96');meow(h,2300,900,true);assert.equal(h.elements.get('gameStatus').textContent,'Zzz');
     assert.equal(h.elements.get('gameStatus').hidden,false);
+  }],
+  ['silence keeps the instruction and the pause after a meow is not scolded', h => {
+    h.run('startGame();audioCtx={state:"running",sampleRate:48000,close:async()=>{}};timeData=new Float32Array(2048);analyser={getFloatTimeDomainData:b=>b.fill(0)};minVol=.0015;scareVol=.005');
+    for (const t of [1500,2000,2500]) { h.time(t); h.run('frameLoop()'); }
+    assert.equal(h.elements.get('gameStatus').textContent,'Meow for about a second, then pause.');
+    meow(h,2600,900); for (const t of [3800,4800]) { h.time(t); h.run('frameLoop()'); }
+    assert.equal(h.elements.get('gameStatus').textContent,'Nice meow! +8');
   }],
   ['calibration interrupted by backgrounding recovers', async h => {
     audio(h);const pending=h.run('startAudio()');await flush();h.context.document.hidden=true;h.events.visibilitychange();await pending;

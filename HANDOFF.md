@@ -6,6 +6,13 @@ unless an entry says a real phone was used.
 
 ## Log
 
+## 2026-10-21 Copy pass (this entry's commit)
+Did: one instruction phrase reused verbatim; removed silence nag, play heading, duplicate Thai loss line; rank joke is win headline; "Nice slide! +12"; clearer errors; short-screen sun moved off text.
+Root cause (if fix): silence hint replaced the opening instruction after ~1s and scolded the pause after each meow.
+Verified: 28/28 regression checks; headless Chrome landing/play/win/loss at 390x844, 375x548, 320x568, 780x400.
+NOT verified: real phones.
+Next: fill SPEC.md phone tuning log on iPhone Safari and Android Chrome.
+
 ## 2026-10-21 Review fixes (this entry's commit)
 Did: 120ms scare hold; median calibration; LINE redirect via `?openExternalBrowser=1`; description/og meta and favicon; 64-color idle/walk rows (page 300KB → 97KB); portable build scripts; derived sprite-gen files untracked; dead CSS removed; REVIEW.md retired to git history; SPEC.md phone tuning log added.
 Root cause (if fix): one loud frame (tap, bump, plosive) counted as a scream; calibration mean jumped on any stray sound.

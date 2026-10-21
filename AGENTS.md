@@ -60,11 +60,13 @@ commit/push authorizes that deployment; do not ask again.
   accounting for sprite width; resize updates bounds. `renderScene` updates
   the calibrated quiet/gentle/loud meter and a non-announcing, inspectable timer.
   Reaction bubbles follow the cat, clamp inside the viewport during travel,
-  and keep the existing live status announcements. Short screens simplify
-  decorative headings and result tips to preserve controls.
+  and keep the existing live status announcements. Short screens hide the
+  result tip and lift the sun to preserve text and controls.
 - Results: `showEndScreen` mixes average duration/glide quality with time.
   Rank criteria and drift/scare loss reasons are explained to the player.
-  Rank title language follows the selected Thai/English text.
+  The rank title is the headline; its `lang` follows the Thai/English text.
+- Copy: one instruction phrase reused verbatim ("Meow for about a second, then
+  pause."), "meow" as the only name for the sound, no internal terms.
 
 ## Debug and tests
 

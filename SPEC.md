@@ -54,11 +54,16 @@ new real-phone measurements justify a change.
 Rank score = 60% average meow quality + 40% completion-time bonus.
 Quality = duration fit (80%) + glide bonus (20%). Thresholds: S 0.8,
 A 0.6, B 0.35, otherwise C. Titles remain playful, with Thai S/C jokes and
-English A/B titles. Best time stores successful completion times only.
+English A/B titles. The rank title is the win headline; a loss shows one
+English title, not a stacked translation. Best time stores successful
+completion times only.
 
-Teach “gentle meow for about a second, then pause”. Show candidate, rejection,
-accepted step (+8/+12), and wandering feedback in a bubble above the cat,
-without unreadable frame flicker. Meter bands follow calibrated thresholds. Explain
+Teach one phrase, reused word for word: “Meow for about a second, then pause.”
+Call the sound a meow everywhere; no internal terms (accepted, voiced, calls).
+Show candidate, rejection, accepted step (“Nice meow! +8”, or “Nice slide! +12”
+for a pitch slide), and wandering feedback in a bubble above the cat, without
+unreadable frame flicker. Silence never replaces the instruction or scolds the
+pause after a meow. Meter bands follow calibrated thresholds. Explain
 rank improvement on results. Loss guidance distinguishes timeout, scares,
 and wandering. Keep rank color in a readable letter badge with dark text.
 
@@ -74,8 +79,9 @@ is embedded in index.html.
 Landing has the cat/world, short instructions, and Start. Starting/calibration
 show status and Start over. Play shows mic meter, inspectable countdown,
 status, and Start over; interrupted audio shows Tap to resume mic. Results
-use a readable card with rank badge/time/best/tip/retry and a screenshot hint.
-Short landscape hides decorative headings and the rank tip to keep controls visible.
+use a readable card with rank badge, rank-title headline, time/best, tip, retry,
+and a screenshot hint. Short screens hide the rank tip and lift the sun so text
+and controls stay clear.
 
 LINE's in-app browser is redirected once to the same URL with
 `openExternalBrowser=1`, which asks LINE to open the system browser.
